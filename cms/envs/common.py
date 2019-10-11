@@ -512,7 +512,7 @@ MIDDLEWARE_CLASSES = [
     'openedx.core.djangoapps.lang_pref.middleware.LanguagePreferenceMiddleware',
 
     # Allows us to dark-launch particular languages
-    'openedx.core.djangoapps.dark_lang.middleware.DarkLangMiddleware',
+    #'openedx.core.djangoapps.dark_lang.middleware.DarkLangMiddleware',
 
     'openedx.core.djangoapps.embargo.middleware.EmbargoMiddleware',
 
