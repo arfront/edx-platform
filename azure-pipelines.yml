@@ -4,7 +4,7 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/python
 
 trigger:
-- master
+- ironwood-master
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -16,6 +16,7 @@ strategy:
 
 steps:
 - task: UsePythonVersion@0
+  displayName: 'Using Python36'
   inputs:
     versionSpec: '$(PYTHON_VERSION)'
     architecture: 'x64'
@@ -38,6 +39,7 @@ steps:
 
 
 - task: DownloadPipelineArtifact@2
+  displayName: 'Download tutor from pipline'
   inputs:
     buildType: 'specific'
     project: '2a2c366f-cc45-484c-9cb4-b85fb801f4c0'
@@ -47,6 +49,7 @@ steps:
     targetPath: '$(Pipeline.Workspace)'
 
 - task: CmdLine@2
+  displayName: 'install tutor'
   inputs:
     script: |
       export LC_ALL=C.UTF-8
@@ -55,28 +58,34 @@ steps:
     workingDirectory: '$(Pipeline.Workspace)'
 
 - task: DockerInstaller@0
+  displayName: 'install docker CLI'
   inputs:
     dockerVersion: '17.09.0-ce'
 
 - task: Docker@2
+  displayName: 'login docker hub'
   inputs:
     containerRegistry: 'docker-arfront'
     command: 'login'
 
 - task: CmdLine@2
+  displayName: 'tutor config'
   inputs:
-    script: 'tutor config save --set ANDROID_OAUTH2_SECRET=$(ANDROID_OAUTH2_SECRET) --set ID=$(ID) --set MYSQL_ROOT_PASSWORD=$(MYSQL_ROOT_PASSWORD) --set OPENEDX_MYSQL_PASSWORD=$(OPENEDX_MYSQL_PASSWORD) --set OPENEDX_SECRET_KEY=$(OPENEDX_SECRET_KEY) --set DOCKER_IMAGE_OPENEDX=arfront/kh-academy:latest'
+    script: 'tutor config save --set DOCKER_IMAGE_OPENEDX=arfront/kh-academy:latest'
     workingDirectory: '$(System.ArtifactsDirectory)'
 
 - task: CmdLine@2
+  displayName: 'tutor build openedx images'
   inputs:
     script: 'tutor images build openedx --build-arg EDX_PLATFORM_REPOSITORY=https://github.com/arfront/edx-platform.git --build-arg EDX_PLATFORM_VERSION=ironwood-master'
 
 - task: CmdLine@2
+  displayName: 'tag openedx image with build id'
   inputs:
     script: 'docker tag arfront/kh-academy:latest arfront/kh-academy:$(Build.BuildId)'
 
 - task: CmdLine@2
+  displayName: 'push openedx images to docker hub'
   inputs:
     script: 'tutor images push arfront/openedx'
 
