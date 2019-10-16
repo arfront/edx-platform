@@ -36,12 +36,15 @@ steps:
       print('Found Django project in', project_location)
       print('##vso[task.setvariable variable=projectRoot]{}'.format(project_location))
 
-- task: DownloadGitHubRelease@0
+
+- task: DownloadPipelineArtifact@2
   inputs:
-    connection: 'jekeans'
-    userRepository: 'arfront/tutor'
-    defaultVersionType: 'latest'
-    downloadPath: '$(System.ArtifactsDirectory)'
+    buildType: 'specific'
+    project: '2a2c366f-cc45-484c-9cb4-b85fb801f4c0'
+    definition: '45'
+    buildVersionToDownload: 'latest'
+    artifactName: 'tutor'
+    targetPath: '$(Pipeline.Workspace)'
 
 - task: CmdLine@2
   inputs:
@@ -49,7 +52,7 @@ steps:
       export LC_ALL=C.UTF-8
       export LANG=C.UTF-8
       pip3 install -e .
-    workingDirectory: '$(System.ArtifactsDirectory)'
+    workingDirectory: '$(Pipeline.Workspace)'
 
 - task: DockerInstaller@0
   inputs:
