@@ -10,12 +10,8 @@ pool:
   vmImage: 'ubuntu-latest'
 strategy:
   matrix:
-    Python35:
-      PYTHON_VERSION: '3.5'
     Python36:
       PYTHON_VERSION: '3.6'
-    Python37:
-      PYTHON_VERSION: '3.7'
   maxParallel: 3
 
 steps:
@@ -40,19 +36,44 @@ steps:
       print('Found Django project in', project_location)
       print('##vso[task.setvariable variable=projectRoot]{}'.format(project_location))
 
-- script: |
-    python -m pip install --upgrade pip setuptools wheel
-    pip install -r requirements.txt
-    pip install unittest-xml-reporting
-  displayName: 'Install prerequisites'
-
-- script: |
-    pushd '$(projectRoot)'
-    python manage.py test --testrunner xmlrunner.extra.djangotestrunner.XMLTestRunner --no-input
-  displayName: 'Run tests'
-
-- task: PublishTestResults@2
+- task: DownloadGitHubRelease@0
   inputs:
-    testResultsFiles: "**/TEST-*.xml"
-    testRunTitle: 'Python $(PYTHON_VERSION)'
-  condition: succeededOrFailed()
+    connection: 'jekeans'
+    userRepository: 'arfront/tutor'
+    defaultVersionType: 'latest'
+    downloadPath: '$(System.ArtifactsDirectory)'
+
+- task: CmdLine@2
+  inputs:
+    script: |
+      export LC_ALL=C.UTF-8
+      export LANG=C.UTF-8
+      pip3 install -e .
+    workingDirectory: '$(System.ArtifactsDirectory)'
+
+- task: DockerInstaller@0
+  inputs:
+    dockerVersion: '17.09.0-ce'
+
+- task: Docker@2
+  inputs:
+    containerRegistry: 'docker-arfront'
+    command: 'login'
+
+- task: CmdLine@2
+  inputs:
+    script: 'tutor config save --set ANDROID_OAUTH2_SECRET=$(ANDROID_OAUTH2_SECRET) --set ID=$(ID) --set MYSQL_ROOT_PASSWORD=$(MYSQL_ROOT_PASSWORD) --set OPENEDX_MYSQL_PASSWORD=$(OPENEDX_MYSQL_PASSWORD) --set OPENEDX_SECRET_KEY=$(OPENEDX_SECRET_KEY) --set DOCKER_IMAGE_OPENEDX=arfront/kh-academy:latest'
+    workingDirectory: '$(System.ArtifactsDirectory)'
+
+- task: CmdLine@2
+  inputs:
+    script: 'tutor images build openedx --build-arg EDX_PLATFORM_REPOSITORY=https://github.com/arfront/edx-platform.git --build-arg EDX_PLATFORM_VERSION=ironwood-master'
+
+- task: CmdLine@2
+  inputs:
+    script: 'docker tag arfront/kh-academy:latest arfront/kh-academy:$(Build.BuildId)'
+
+- task: CmdLine@2
+  inputs:
+    script: 'tutor images push arfront/openedx'
+
