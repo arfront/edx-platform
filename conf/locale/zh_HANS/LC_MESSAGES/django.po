@@ -5188,7 +5188,7 @@ msgstr "请检查条目的句法。"
 
 #: lms/djangoapps/branding/api.py
 msgid "Take free online courses at edX.org"
-msgstr "在 edX.org 学习免费课程"
+msgstr "在 科海商学院 学习免费课程"
 
 #. Translators: 'edX' and 'Open edX' are trademarks of 'edX Inc.'.
 #. Please do not translate any of these trademarks and company names.
