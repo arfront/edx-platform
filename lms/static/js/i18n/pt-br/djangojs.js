@@ -239,7 +239,6 @@
     "Copy Email To Editor": "Copiar email ao editor", 
     "Correct failed component": "Corrigir falha de componente", 
     "Could not find users associated with the following identifiers:": "N\u00e3o foi poss\u00edvel localizar usu\u00e1rios associados aos seguintes identificadores:", 
-    "Could not parse certificate JSON. %(message)s": "N\u00e3o foi poss\u00edvel verificar o certificado JSON. %(message)s", 
     "Could not retrieve download url.": "N\u00e3o foi poss\u00edvel recuperar o url de download.", 
     "Could not retrieve payment information": "N\u00e3o foi poss\u00edvel recuperar a informa\u00e7\u00e3o de pagamento.", 
     "Could not retrieve upload url.": "N\u00e3o foi poss\u00edvel recuperar o url de upload.", 
