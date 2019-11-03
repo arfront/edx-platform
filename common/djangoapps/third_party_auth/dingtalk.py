@@ -7,7 +7,7 @@ from hashlib import sha256
 from social_core.backends.oauth import BaseOAuth2
 
 class DingtalkOAuth2(BaseOAuth2):
-    name = "dingtalk"
+    name = "DingTalk"
     AUTHORIZATION_URL = 'https://oapi.dingtalk.com/connect/qrconnect'
     ACCESS_TOKEN_URL = ''
 
