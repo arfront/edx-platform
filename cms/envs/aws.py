@@ -333,6 +333,9 @@ if AWS_SECRET_ACCESS_KEY == "":
 
 AWS_STORAGE_BUCKET_NAME = AUTH_TOKENS.get('AWS_STORAGE_BUCKET_NAME', 'edxuploads')
 
+DINGTALK_ACCESS_KEY = AUTH_TOKENS['DINGTALK_ACCESS_KEY']
+DINGTALK_APP_SECRET = AUTH_TOKENS['DINGTALK_APP_SECRET']
+
 # Disabling querystring auth instructs Boto to exclude the querystring parameters (e.g. signature, access key) it
 # normally appends to every returned URL.
 AWS_QUERYSTRING_AUTH = AUTH_TOKENS.get('AWS_QUERYSTRING_AUTH', True)

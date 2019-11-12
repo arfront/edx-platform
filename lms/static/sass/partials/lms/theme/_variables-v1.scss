@@ -500,7 +500,7 @@ $course-card-height: ($baseline*18) !default;
 $course-image-height: ($baseline*8) !default;
 $course-info-height: ($baseline*10) !default;
 $course-title-height: ($baseline*3.6) !default;
-$homepage-bg-image: none !default;
+$homepage-bg-image: url('#{$static-path}/images/lms_banner.png') !default;;
 $login-banner-image: url('#{$static-path}/images/edx-theme/edx-background-banner-account.png') !default;
 $register-banner-image: url('#{$static-path}/images/edx-theme/edx-background-banner-account.png') !default;
 $passwordreset-banner-image: url('#{$static-path}/images/edx-theme/edx-background-banner-account.png') !default;

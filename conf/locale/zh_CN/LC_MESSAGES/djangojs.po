@@ -10540,3 +10540,14 @@ msgstr "您变更了视频的 URL，但没有变更字幕文件。您希望继�
 #: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
 msgid "Use Current Transcript"
 msgstr "使用当前字幕"
+
+#: cms/templates/index.html
+msgid "Success user info:"
+msgstr "成功用户信息："
+
+#: cms/templates/index.html
+msgid "fail user info:"
+msgstr "失败用户信息："
+
+msgid "Import users from dingtalk"
+msgstr "从钉钉导入用户"
