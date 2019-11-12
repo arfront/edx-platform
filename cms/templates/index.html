@@ -40,10 +40,6 @@ from openedx.core.djangolib.js_utils import (
             <a href="#" class="button new-button new-library-button"><span class="icon fa fa-plus icon-inline" aria-hidden="true"></span>
             ${_("New Library")}</a>
           % endif
-          % if user.is_staff:
-            <a href="#" class="button new-button dingtalk-user-button"><span class="icon fa fa-plus icon-inline" aria-hidden="true"></span>
-            ${_("Import users from dingtalk")}</a>
-          % endif
         </li>
       </ul>
     </nav>
@@ -189,15 +185,6 @@ from openedx.core.djangolib.js_utils import (
         </form>
       </div>
       % endif
-
-      <div class="wrapper-create-element wrapper-insert-result">
-          <p>${_("Success user info:")}</p>
-          <ul id="success_add_user_info">
-          </ul>
-          <p>${_("fail user info:")}</p>
-          <ul id="fail_add_user_info">
-          </ul>
-      </div>
 
       %if optimization_enabled:
       <div class="optimization-form">
