@@ -24630,3 +24630,9 @@ msgstr "获取用户列表失败"
 
 msgid "Import users from dingtalk"
 msgstr "从钉钉导入用户"
+
+msgid "K&H Academy"
+msgstr "科海商学院"
+
+msgid "K&H"
+msgstr "科海"

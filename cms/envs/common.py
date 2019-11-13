@@ -167,8 +167,8 @@ from openedx.core.release import doc_version
 # Dummy secret key for dev/test
 SECRET_KEY = 'dev key'
 
-STUDIO_NAME = _("Your Platform Studio")
-STUDIO_SHORT_NAME = _("Studio")
+STUDIO_NAME = _("K&H Academy")
+STUDIO_SHORT_NAME = _("K&H")
 FEATURES = {
     'GITHUB_PUSH': False,
 
