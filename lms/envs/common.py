@@ -49,7 +49,7 @@ from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
-PLATFORM_NAME = _('Your Platform Name Here')
+PLATFORM_NAME = _('K&H Academy')
 PLATFORM_DESCRIPTION = _('Your Platform Description Here')
 CC_MERCHANT_NAME = PLATFORM_NAME
 
@@ -2090,6 +2090,7 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.oauth_dispatch.apps.OAuthDispatchAppConfig',
 
     'third_party_auth',
+    'dingtalkuser',
 
     # We don't use this directly (since we use OAuth2), but we need to install it anyway.
     # When a user is deleted, Django queries all tables with a FK to the auth_user table,

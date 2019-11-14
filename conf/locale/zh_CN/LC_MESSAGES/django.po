@@ -12173,6 +12173,30 @@ msgstr "可使用标签的字典"
 msgid "Studio Administration"
 msgstr "Studio管理"
 
+#: cms/djangoapps/api/v1/views/kh_user_manage.py
+msgid "No config of dingtalk can be used"
+msgstr "无可用的钉钉配置"
+
+#: cms/djangoapps/api/v1/views/kh_user_manage.py
+msgid "No secret or key in config"
+msgstr "配置中没有秘钥或密匙"
+
+#: cms/djangoapps/api/v1/views/kh_user_manage.py
+msgid "No email information"
+msgstr "没有email信息"
+
+#: cms/djangoapps/api/v1/views/kh_user_manage.py
+msgid "Synchronous user successful"
+msgstr "同步用户信息成功"
+
+#: cms/djangoapps/api/v1/views/kh_user_manage.py
+msgid "User created successfuly"
+msgstr "创建用户成功"
+
+#: cms/djangoapps/api/v1/views/kh_user_manage.py
+msgid "User existed in databases"
+msgstr "该用户已存在"
+
 #: cms/templates/404.html cms/templates/error.html
 #: lms/templates/static_templates/404.html
 msgid "Page Not Found"
@@ -24588,3 +24612,30 @@ msgstr "注册账号"
 
 msgid "First time here?"
 msgstr "初次使用？"
+
+#: cms/templates/index.html
+msgid "Success user info:"
+msgstr "成功用户信息："
+
+#: cms/templates/index.html
+msgid "fail user info:"
+msgstr "失败用户信息："
+
+# cms/djangoapps/api/v1/views/kh_user_manage.py
+msgid "Failed to get the number of users"
+msgstr "获取用户数目失败"
+
+msgid "Failed to get user list"
+msgstr "获取用户列表失败"
+
+msgid "Import users from dingtalk"
+msgstr "从钉钉导入用户"
+
+msgid "K&H Academy"
+msgstr "科海商学院"
+
+msgid "K&H"
+msgstr "科海"
+
+msgid "S3 Video Upload"
+msgstr "S3视频上传"
