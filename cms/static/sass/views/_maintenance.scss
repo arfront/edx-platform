@@ -40,7 +40,7 @@
     max-width: 1280px;
     margin: 20px auto;
 
-      .dingtalk-bottom {
+      .dingtalk-bottom, .dingtalk-button-delete {
         margin-left: 13px;
         background-color: #0075b4;
         border: none;
@@ -54,12 +54,16 @@
       .dingtalk-bottom:hover {
         background-color: #045d96;
       }
+      .dingtalk-button-delete:hover {
+        background-color: #045d96;
+        color: white;
+      }
   }
-  .dingtalk-user-info-box {
+  .dingtalk-user-info-box, .dingtalk-delete-result {
     max-width: 1280px;
     margin: 20px auto;
   }
-  .is-shown {
+  .is-shown, .result-is-shown {
       display: none;
   }
   .dingtalk-user-info-list {
