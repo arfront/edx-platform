@@ -24639,3 +24639,15 @@ msgstr "科海"
 
 msgid "S3 Video Upload"
 msgstr "S3视频上传"
+
+msgid "Successfully deleted users"
+msgstr "删除用户成功"
+
+msgid "No users to delete"
+msgstr "没有用户被删除"
+
+msgid "Delete result:"
+msgstr "删除结果："
+
+msgid "Delete terminated employee"
+msgstr "删除离职员工"
