@@ -66,7 +66,7 @@ class CourseOverview(TimeStampedModel):
     announcement = DateTimeField(null=True)
 
     # URLs
-    course_image_url = TextField()
+    course_image_url = TextField(default='/static/images/default_course_image.jpg')
     social_sharing_url = TextField(null=True)
     end_of_course_survey_url = TextField(null=True)
 
