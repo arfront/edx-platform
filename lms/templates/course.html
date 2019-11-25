@@ -10,7 +10,7 @@ from six import text_type
   <a href="${reverse('about_course', args=[text_type(course.id)])}">
     <header class="course-image">
       <div class="cover-image">
-        <img src="${course.course_image_url}" alt="${course.display_name_with_default} ${course.display_number_with_default}" />
+        <img src="${course.course_image_url}" alt="${course.display_name_with_default} ${course.display_number_with_default}" onerror="javascript:this.src='/static/images/default_course_image.jpg'" />
         <div class="learn-more" aria-hidden="true">${_("LEARN MORE")}</div>
       </div>
     </header>

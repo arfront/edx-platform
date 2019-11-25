@@ -203,9 +203,9 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
             </ol>
           </fieldset>
         </div>
-        
+
         <hr class="divide" />
-        
+
         <div id="schedule" class="group-settings schedule">
           <header>
             <h2 class="title-2">${_('Course Schedule')}</h2>
@@ -385,7 +385,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
                   <div class="current current-course-image">
                     % if context_course.course_image:
                     <span class="wrapper-course-image">
-                      <img class="course-image" id="course-image" src="${course_image_url}" alt="${_('Course Card Image')}"/>
+                      <img class="course-image" id="course-image" src="${course_image_url}" alt="${_('Course Card Image')}" onerror="javascript:this.src='/static/images/default_course_image.jpg'"/>
                     </span>
 
                     <span class="msg msg-help">
@@ -397,7 +397,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
 
                     % else:
                     <span class="wrapper-course-image">
-                      <img class="course-image placeholder" id="course-image" src="${course_image_url}" alt="${_('Course Card Image')}"/>
+                      <img class="course-image placeholder" id="course-image" src="${course_image_url}" alt="${_('Course Card Image')}" onerror="javascript:this.src='/static/images/default_course_image.jpg'"/>
                     </span>
                     <span class="msg msg-empty">${_("Your course currently does not have an image. Please upload one (JPEG or PNG format, and minimum suggested dimensions are 375px wide by 200px tall)")}</span>
                     % endif
@@ -419,7 +419,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
                   <div class="current current-course-image">
                     % if context_course.banner_image:
                     <span class="wrapper-course-image">
-                      <img class="course-image" id="banner-image" src="${banner_image_url}" alt="${_('Course Banner Image')}"/>
+                      <img class="course-image" id="banner-image" src="${banner_image_url}" alt="${_('Course Banner Image')}" onerror="javascript:this.src='/static/images/default_course_image.jpg'"/>
                     </span>
 
                     <span class="msg msg-help">
@@ -431,7 +431,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
 
                     % else:
                     <span class="wrapper-course-image">
-                      <img class="course-image placeholder" id="banner-image" src="${banner_image_url}" alt="${_('Course Banner Image')}"/>
+                      <img class="course-image placeholder" id="banner-image" src="${banner_image_url}" alt="${_('Course Banner Image')}" onerror="javascript:this.src='/static/images/default_course_image.jpg'"/>
                     </span>
                     <span class="msg msg-empty">${_("Your course currently does not have an image. Please upload one (JPEG or PNG format, and minimum suggested dimensions are 1440px wide by 400px tall)")}</span>
                     % endif

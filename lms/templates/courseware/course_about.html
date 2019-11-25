@@ -179,7 +179,7 @@ from six import string_types
             </a>
           %endif
         %else:
-          <% 
+          <%
             if ecommerce_checkout:
               reg_href = ecommerce_checkout_link
             else:
@@ -200,14 +200,14 @@ from six import string_types
       % if get_course_about_section(request, course, "video"):
       <a href="#video-modal" class="media" rel="leanModal">
         <div class="hero">
-          <img src="${course_image_urls['large']}" alt="" />
+          <img src="${course_image_urls['large']}" alt="" onerror="javascript:this.src='/static/images/default_course_image.jpg'"/>
           <div class="play-intro"></div>
         </div>
       </a>
       %else:
       <div class="media">
         <div class="hero">
-          <img src="${course_image_urls['large']}" alt="" />
+          <img src="${course_image_urls['large']}" alt="" onerror="javascript:this.src='/static/images/default_course_image.jpg'"/>
         </div>
       </div>
       % endif

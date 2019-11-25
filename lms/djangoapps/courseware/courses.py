@@ -502,7 +502,6 @@ def sort_by_start_date(courses):
 
     return courses
 
-
 def get_cms_course_link(course, page='course'):
     """
     Returns a link to course_index for editing the course in cms,
