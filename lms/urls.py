@@ -51,6 +51,7 @@ from staticbook import views as staticbook_views
 from student import views as student_views
 from track import views as track_views
 from util import views as util_views
+from course_api.views import WechatFileDownloadView
 
 if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
     django_autodiscover()
@@ -67,6 +68,7 @@ handler404 = static_template_view_views.render_404
 handler500 = static_template_view_views.render_500
 
 urlpatterns = [
+    url(r'^MP_verify_a3W87AwAfQ0UMMUV.txt', WechatFileDownloadView.as_view()),
     url(r'^$', branding_views.index, name='root'),   # Main marketing page, or redirect to courseware
 
     url(r'', include('student.urls')),

@@ -3,10 +3,22 @@ Course API Views
 """
 
 import search
+import requests
+import logging
+import time
+import os
+import json
+import uuid
+import hashlib
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.utils.translation import ugettext_lazy as _
+from django.http import HttpResponse
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.throttling import UserRateThrottle
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.status import HTTP_200_OK
 
 from edx_rest_framework_extensions.paginators import NamespacedPageNumberPagination
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
@@ -15,6 +27,136 @@ from . import USE_RATE_LIMIT_2_FOR_COURSE_LIST_API, USE_RATE_LIMIT_10_FOR_COURSE
 from .api import course_detail, list_courses
 from .forms import CourseDetailGetForm, CourseListGetForm
 from .serializers import CourseDetailSerializer, CourseSerializer
+from wechatuser.models import WechatUserconfig
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+
+
+class CsrfExemptSessionAuthentication(SessionAuthentication):
+
+    def enforce_csrf(self, request):
+        return
+
+log = logging.getLogger(__name__)
+wechat_filepath = '/openedx/data/wechat/'
+wechat_access_token_filename = 'access_token.json'
+wechat_ticket_filename = 'ticket.json'
+error_msg_no_config_of_wechat_can_be_used = _("No config of wechat can be used")
+
+
+class WechatFileDownloadView(APIView):
+    
+    def get(self, request):
+        file = open('/openedx/edx-platform/lms/static/MP_verify_a3W87AwAfQ0UMMUV.txt', 'r')
+        response = HttpResponse(file, content_type='text/plain')
+        return response
+
+class CourseshareofwechatView(APIView):
+    authentication_classes = (CsrfExemptSessionAuthentication, BasicAuthentication)
+    
+    def post(self, request):
+        url = request.data['url']
+        data = {}
+        if not os.path.exists(wechat_filepath):
+            os.makedirs(wechat_filepath)
+
+        config = WechatUserconfig.current()
+        if config.enabled:
+            appid = config.get_setting('KEY')
+            secret = config.get_setting('SECRET')
+        else:
+            return Response({'msg': error_msg_no_config_of_wechat_can_be_used}, HTTP_200_OK)
+        
+        access_token_url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={appid}&secret={secret}". \
+            format(appid=appid, secret=secret)
+        access_token = self._get_data(access_token_url, wechat_access_token_filename, 'access_token')
+        if isinstance(access_token, dict):
+            return Response(access_token, status=HTTP_200_OK)
+        ticket_url = "https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token={access_token}&type=jsapi".format(access_token=access_token)
+        ticket =  self._get_data(ticket_url, wechat_ticket_filename, 'ticket')
+        if isinstance(ticket, dict):
+            return Response(ticket, status=HTTP_200_OK)
+        
+        signature, noncestr, timestamp = self._get_signature(ticket, url)
+        data['appid'] = appid
+        data['timestamp'] = timestamp
+        data['noncestr'] = noncestr
+        data['signature'] = signature
+        return Response({'data': data, 'msg': 'Get wechat data success', 'status': '10001'}, status=HTTP_200_OK)
+    
+    def _get_signature(self, jsapi_ticket, url):
+        signature_sx_dict = {}
+        noncestr = str(uuid.uuid4())
+        timestamp = str(int(time.time()))
+        signature_sx_dict[1] = "noncestr={noncestr}".format(noncestr=noncestr)
+        signature_sx_dict[0] = "jsapi_ticket={jsapi_ticket}".format(jsapi_ticket=jsapi_ticket)
+        signature_sx_dict[2] = "timestamp={timestamp}".format(timestamp=timestamp)
+        signature_sx_dict[3] = "url={url}".format(url=url)
+        signature_sx_str = ''
+        for i in sorted(signature_sx_dict.keys()):
+            signature_sx_str += signature_sx_dict[i] + "&"
+
+        signature_sx_str = signature_sx_str[:-1]
+        signature_str = hashlib.sha1(signature_sx_str.encode('utf-8')).hexdigest()
+        return signature_str, noncestr, timestamp
+        
+    def _get_data_by_network(self, url, file_name, type):
+        '''
+        :param url:
+        :param file_name: wechat_ticket_filename or wechat_access_token_filename
+        :param type: access_token or ticket
+        :return:
+        '''
+        try:
+            response = requests.get(url)
+            res = json.loads(response.content)
+        except Exception as e:
+            res = {'errmsg': str(e), 'errcode': '10002'}
+        
+        if type == 'access_token':
+            if 'errcode' in res:
+                print(res)
+                log.error({'detail': res['errmsg']})
+                return {
+                        'msg': 'Failed to get wechat access token',
+                        'status': '10002',
+                        'detail': res['errmsg']
+                        }
+        elif type == 'ticket':
+            if 'errcode' not in res or res['errcode'] != 0:
+                log.error({'detail': res['errmsg']})
+                return {'msg': 'Failed to get wechat ticket', 'status': '10002', 'detail': res['errmsg']}
+            
+        res['last_time'] = int(time.time())
+        try:
+            json_res = json.dumps(res)
+        except Exception:
+            json_res = {}
+        
+        with open(wechat_filepath + file_name, 'w') as f:
+            f.write(json_res)
+        return res
+    
+    def _get_data(self, url, file_name, type):
+        '''
+        :param url:
+        :param file_name:
+        :param type: access_token or ticket
+        :return:
+        '''
+        try:
+            with open(wechat_filepath + file_name, 'r') as f:
+                res = json.load(f)
+        except Exception:
+            res = self._get_data_by_network(url, file_name, type)
+        
+        if 'last_time' in res:
+            set_time = int(res['last_time']) + int(res['expires_in'])
+            if set_time < int(time.time()):
+                res = self._get_data_by_network(url, file_name, type)
+                
+        if 'status' in res:
+            return res
+        return res[type]
 
 
 @view_auth_classes(is_authenticated=False)
