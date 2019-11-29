@@ -15393,6 +15393,14 @@ msgstr "在 {platform} 上在线学习课程"
 msgid "I just enrolled in {number} {title} through {platform} {url}"
 msgstr "我刚通过 {platform} {url} 选修了 {number} {title}"
 
+# lms/templates/courseware/course_about_sidebar_header.html
+msgid "I just enrolled in {number} {title} through {platform}"
+msgstr "我刚通过 {platform} 选修了 {number} {title}"
+
+# lms/templates/courseware/course_about_sidebar_header.html
+msgid "course of {platform} sharing"
+msgstr "{platform}课程分享"
+
 #: lms/templates/courseware/course_about_sidebar_header.html
 #: themes/stanford-style/lms/templates/courseware/course_about_sidebar_header.html
 msgid "Tweet that you've enrolled in this course"
@@ -24651,3 +24659,6 @@ msgstr "删除结果："
 
 msgid "Delete terminated employee"
 msgstr "删除离职员工"
+
+msgid "No config of wechat can be used"
+msgstr "无可用的微信配置"
