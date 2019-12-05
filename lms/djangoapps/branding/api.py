@@ -213,6 +213,7 @@ def _footer_navigation_links():
             ("contact", reverse("support:contact_us"), _("Contact")),
             ("careers", marketing_link("CAREERS"), _("Careers")),
             ("donate", marketing_link("DONATE"), _("Donate")),
+            ("are-you-teacher", settings.CMS_ROOT_URL, _("Are you teacher?")),
         ]
         if link_url and link_url != "#"
     ]
