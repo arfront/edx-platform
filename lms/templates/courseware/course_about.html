@@ -376,13 +376,14 @@ from six import string_types
 
 <script type="text/javascript" src="${static.url('common/js/vendor/jquery.js')}"></script>
 <script src="https://g.alicdn.com/dingding/dingtalk-jsapi/2.7.13/dingtalk.open.js"></script>
-<script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.4.0.js"></script>
+<script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.4.0.js"></script>
 <script type="application/javascript">
-    $('.fa-dingtalk').click(function () {
-        var dingtalk_target_url = $('#dingtalk_target_url').html();
-        var dingtalk_text = $('#dingtalk_text').html();
-        var course_image_url = $('#course_image_url').html();
-        var dingtalk_title = $('#dingtalk_title').html();
+    var $2 = $.noConflict();
+    $2('.fa-dingtalk').click(function () {
+        var dingtalk_target_url = $2('#dingtalk_target_url').html();
+        var dingtalk_text = $2('#dingtalk_text').html();
+        var course_image_url = $2('#course_image_url').html();
+        var dingtalk_title = $2('#dingtalk_title').html();
         if (dd.env.platform=="notInDingTalk") {
             alert('please open it in DingTalk')
         } else {
@@ -400,18 +401,18 @@ from six import string_types
         }
     });
 
-    $('.fa-wechat').click(function () {
-        var dingtalk_target_url = $('#dingtalk_target_url').html();
-        var dingtalk_text = $('#dingtalk_text').html();
-        var course_image_url = $('#course_image_url').html();
-        var dingtalk_title = $('#dingtalk_title').html();
+    $2('.fa-wechat').click(function () {
+        var dingtalk_target_url = $2('#dingtalk_target_url').html();
+        var dingtalk_text = $2('#dingtalk_text').html();
+        var course_image_url = $2('#course_image_url').html();
+        var dingtalk_title = $2('#dingtalk_title').html();
         var now_url = window.location.href;
-        var host=window.location.host;
+        var host= window.location.host;
         var protocolStr = document.location.protocol;
         data = {
             "url": now_url
         }
-        $.ajax({
+        $2.ajax({
             url:  protocolStr+ '//' + host + "/api/courses/v1/coursessharewechat/",
             type: "POST",
             data: data,
