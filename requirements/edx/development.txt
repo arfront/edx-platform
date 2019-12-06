@@ -356,3 +356,4 @@ xmltodict==0.11.0
 zendesk==1.1.1
 zope.interface==4.6.0
 pypinyin==0.36.0
+rsa==4.0

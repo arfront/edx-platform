@@ -24665,3 +24665,9 @@ msgstr "无可用的微信配置"
 
 msgid "Are you teacher?"
 msgstr "您是教师？"
+
+msgid "Successfully get arfront youtube account info"
+msgstr "获取科海youtube账户信息成功"
+
+msgid "No config of arfront youtube account"
+msgstr "科海youtube账户信息未设置"

@@ -94,6 +94,22 @@ define([
                 }
             });
 
+            $('.nav-course-sthree-course').click(function(e) {
+              var host=window.location.host;
+              var protocolStr = document.location.protocol;
+              $.ajax({
+                url: protocolStr+ '//' + host + "/api/v1/youtube_account_info/",
+                type: "get",
+                success: function (info) {
+                  if(info['status'] == '10001') {
+                    document.location = info['data']['target_url'];
+                  } else {
+                    alert(info['msg'])
+                  }
+                }
+              });
+            });
+
             // general link management - new window/tab
             $('a[rel="external"]:not([title])')
                 .attr('title', gettext('This link will open in a new browser window/tab'));
