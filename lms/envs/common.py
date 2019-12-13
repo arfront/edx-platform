@@ -2093,6 +2093,7 @@ INSTALLED_APPS = [
     'third_party_auth',
     'dingtalkuser',
     'wechatuser',
+    'arfrontconfig',
 
     # We don't use this directly (since we use OAuth2), but we need to install it anyway.
     # When a user is deleted, Django queries all tables with a FK to the auth_user table,

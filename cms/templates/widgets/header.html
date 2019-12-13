@@ -32,7 +32,6 @@
             advanced_settings_url = reverse('advanced_settings_handler', kwargs={'course_key_string': unicode(course_key)})
             tabs_url = reverse('tabs_handler', kwargs={'course_key_string': unicode(course_key)})
             certificates_url = ''
-            s3_videos_url = 'https://encoder.poy.cn/'
             if settings.FEATURES.get("CERTIFICATES_HTML_VIEW") and context_course.cert_html_view_enabled:
                 certificates_url = reverse('certificates_list_handler', kwargs={'course_key_string': unicode(course_key)})
             checklists_url = reverse('checklists_handler', kwargs={'course_key_string': unicode(course_key)})
@@ -75,8 +74,8 @@
                     <a href="${videos_url}">${_("Video Uploads")}</a>
                   </li>
                   % endif
-                  <li class="nav-item">
-                      <a href="${s3_videos_url}">${_("S3 Video Upload")}</a>
+                  <li class="nav-item nav-course-sthree-course">
+                      <a href="#">${_("S3 Video Upload")}</a>
                   </li>
                 </ul>
               </div>
