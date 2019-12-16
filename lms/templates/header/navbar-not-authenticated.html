@@ -9,6 +9,7 @@
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 from six import text_type
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 %>
 
 <%
@@ -18,6 +19,7 @@ from six import text_type
   can_discover_courses = settings.FEATURES.get('ENABLE_COURSE_DISCOVERY')
   restrict_enroll_for_course = course and settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain
   allow_public_account_creation = static.get_value('ALLOW_PUBLIC_ACCOUNT_CREATION', settings.FEATURES.get('ALLOW_PUBLIC_ACCOUNT_CREATION'))
+  support_link = configuration_helpers.get_value('SUPPORT_SITE_LINK', settings.SUPPORT_SITE_LINK)
 %>
 <nav class="nav-links" aria-label=${_("Supplemental Links")}>
   <div class="main">
@@ -58,6 +60,9 @@ from six import text_type
               <a class="register-btn btn" href="/register${login_query()}">${_("Register")}</a>
             </div>
           % endif
+           <div class="mobile-nav-item hidden-mobile nav-item">
+            <a class="btn" href="${support_link}" target="_blank">${_("Help and Support")}</a>
+           </div>
           <div class="mobile-nav-item hidden-mobile nav-item">
             <a class="sign-in-btn btn" href="/login${login_query()}">${_("Sign in")}</a>
           </div>
