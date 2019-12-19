@@ -23,10 +23,9 @@ log = logging.getLogger(__name__)
 accessKey = ''
 appSecret = ''
 ACCESS_TOKEN_URL = 'https://oapi.dingtalk.com/gettoken'
-USER_AMOUNT_URL = 'https://oapi.dingtalk.com/user/get_org_user_count'
-USER_LIST_URL = 'https://oapi.dingtalk.com/user/listbypage'
-USER_ID_BY_UNIONID_URL = 'https://oapi.dingtalk.com/user/getUseridByUnionid'
-user_data_file_path = '/openedx/data/dingtalk_company_user_data/'
+USER_DEPARTMENT_LISTIDS_URL = 'https://oapi.dingtalk.com/department/list_ids'
+USER_LIST_IDS_LIST_URL = 'https://oapi.dingtalk.com/user/getDeptMember'
+USER_DETAIL_URL = 'https://oapi.dingtalk.com/user/get'
 
 error_msg_no_email_info = _('No email information')
 error_msg_user_existed_in_database = _('User existed in databases')
@@ -48,6 +47,8 @@ class Dingtalkuserinfo:
 
     def __init__(self, accessKey, appSecret):
         self.user_count = 0
+        self._department_ids_list = [1]
+        self._user_id_list = []
         self.access_token_url_param = {
             'appkey': accessKey,
             'appsecret': appSecret
@@ -67,39 +68,92 @@ class Dingtalkuserinfo:
             'access_token': self._token,
             'unionid': ''
         }
+        self.user_department_listids_url_param = {
+            'access_token': self._token,
+            'id': 1
+        }
+        self.user_list_ids_param = {
+            'access_token': self._token,
+            'deptId': 1
+        }
+        self.user_detail_url_param = {
+            'access_token': self._token,
+            'userid': ''
+        }
         self._unsuccess_insert_list = []
         self._success_insert_list = []
-
-    def _get_user_amount(self):
+        
+    def get_all_department_id(self, parent_id=1):
         if not self._token:
             return None
 
-        data = self.deal_url_encode(self.user_amount_url_param)
-        user_amount_url = USER_AMOUNT_URL + '?' + data
-        res = self.get_request_data(user_amount_url)
+        self.user_department_listids_url_param['id'] = parent_id
+        param = self.deal_url_encode(self.user_department_listids_url_param)
+        user_department_listids_url = USER_DEPARTMENT_LISTIDS_URL + "?" + param
+        res = self.get_request_data(user_department_listids_url)
         if res:
-            self.user_count = res['count']
+            self._department_ids_list += res['sub_dept_id_list']
+            for i in res['sub_dept_id_list']:
+                self.get_all_department_id(i)
             return True
         else:
             return False
-
-    def _get_user_list(self):
+        
+    def _get_department_user_list(self, department_id=1):
         if not self._token:
             return None
+        
+        self.user_list_ids_param['deptId'] = department_id
+        param = self.deal_url_encode(self.user_list_ids_param)
+        user_list_ids_list_url= USER_LIST_IDS_LIST_URL + "?" + param
+        res = self.get_request_data(user_list_ids_list_url)
+        if res:
+            return res['userIds']
+        else:
+            return False
+    
+    def get_all_user_data(self):
+        self.get_all_department_id(1)
+        for i in self._department_ids_list:
+            self._user_id_list += self._get_department_user_list(i)
+        
+        self._user_id_list = list(set(self._user_id_list))
+        for userid in self._user_id_list:
+            data = self._get_user_detail_data(userid)
+            if data:
+                if 'email' not in data or data['email'] == '':
+                    user_detail = {
+                        'name': i['name'],
+                        'msg': error_msg_no_email_info
+                    }
+                    self._unsuccess_insert_list.append(user_detail)
+                    continue
+                    
+                data = self._clean_data(data)
+                self._create_user_to_database(data)
 
-        if self.user_count == 0:
-            return []
-
-        offset = int(self.user_count / 100)
-        user_data = []
-        for i in range(offset + 1):
-            self.user_list_url_param['offset'] = i
-            data = self.deal_url_encode(self.user_list_url_param)
-            user_list_url = USER_LIST_URL + '?' + data
-            res = self.get_request_data(user_list_url)
-            if res:
-                user_data += res['userlist']
-        return user_data
+        result = {
+            'status': 10001,
+            'msg': success_msg_sychornous_user_successful,
+            'result': {
+                'success_user_info': self._success_insert_list,
+                'fail_user_info': self._unsuccess_insert_list
+            }
+        }
+        return result
+    
+    def _get_user_detail_data(self, userid):
+        if not self._token:
+            return None
+        
+        self.user_detail_url_param['userid'] = userid
+        param = self.deal_url_encode(self.user_detail_url_param)
+        user_detail_url = USER_DETAIL_URL + '?' + param
+        res = self.get_request_data(user_detail_url)
+        if res:
+            return res
+        else:
+            return False
 
     def _get_access_token(self):
         data = self.deal_url_encode(self.access_token_url_param)
@@ -122,27 +176,6 @@ class Dingtalkuserinfo:
             log.error(traceback.format_exc())
 
         return None
-    
-    def get_post_request_data(self, url, data):
-        try:
-            res = requests.request('post', url=url, data=data)
-            res = json.loads(res.content)
-            if 'errcode' in res:
-                if res['errcode'] == 0:
-                    return res
-                else:
-                    log.error({'errmsg': res['errmsg'], 'url': url})
-        except Exception:
-            log.error(traceback.format_exc())
-        
-        return None
-    
-    def _save_data_to_file(self, data):
-        if not os.path.exists(user_data_file_path):
-            os.makedirs(user_data_file_path)
-
-        with open(user_data_file_path + 'data.json', 'w') as f:
-            f.write(json.dumps(data))
 
     def _clean_data(self, data):
         new_data = {}
@@ -230,51 +263,6 @@ class Dingtalkuserinfo:
             else 'default'
         )
         return connections[db_alias].cursor()
-
-    def update_user_info(self):
-        '''
-        更新用户信息
-        :return:
-        '''
-        get_amount_result = self._get_user_amount()
-        if not get_amount_result:
-            return {
-                'status': 10002,
-                'msg': error_msg_fail_to_get_the_number_of_users,
-            }
-        data = self._get_user_list()
-        if not data:
-            return {
-                'status': 10003,
-                'msg': error_msg_fail_to_get_user_list
-            }
-        new_data = []
-        for i in data:
-            if 'email' not in i or i['email'] == '':
-                user_detail = {
-                    'name': i['name'],
-                    'msg': error_msg_no_email_info
-                }
-                self._unsuccess_insert_list.append(user_detail)
-                continue
-
-            single_data = self._clean_data(i)
-            new_data.append(single_data)
-
-        self._save_data_to_file(new_data)
-        for data in new_data:
-            self._create_user_to_database(data)
-
-        result = {
-            'status': 10001,
-            'msg': success_msg_sychornous_user_successful,
-            'result': {
-                'success_user_info': self._success_insert_list,
-                'fail_user_info': self._unsuccess_insert_list
-            }
-        }
-
-        return result
     
     def delete_leave_job_people(self):
         '''
