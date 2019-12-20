@@ -26,7 +26,7 @@ class GetuserfromDingTalkView(views.APIView):
         if accessKey == '' or appSecret == '':
             return response.Response({'msg': error_msg_no_secret_or_key_in_config}, status=status.HTTP_403_FORBIDDEN)
         dingtalk_user_info = Dingtalkuserinfo(accessKey, appSecret)
-        res = dingtalk_user_info.update_user_info()
+        res = dingtalk_user_info.get_all_user_data()
         return response.Response(res)
 
 
