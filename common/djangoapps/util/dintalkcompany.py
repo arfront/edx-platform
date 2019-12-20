@@ -26,6 +26,7 @@ ACCESS_TOKEN_URL = 'https://oapi.dingtalk.com/gettoken'
 USER_DEPARTMENT_LISTIDS_URL = 'https://oapi.dingtalk.com/department/list_ids'
 USER_LIST_IDS_LIST_URL = 'https://oapi.dingtalk.com/user/getDeptMember'
 USER_DETAIL_URL = 'https://oapi.dingtalk.com/user/get'
+USER_ID_BY_UNIONID_URL = 'https://oapi.dingtalk.com/user/getUseridByUnionid'
 
 error_msg_no_email_info = _('No email information')
 error_msg_user_existed_in_database = _('User existed in databases')
