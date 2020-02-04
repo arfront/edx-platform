@@ -124,7 +124,7 @@ class Dingtalkuserinfo:
             if data:
                 if 'email' not in data or data['email'] == '':
                     user_detail = {
-                        'name': i['name'],
+                        'name': data['name'],
                         'msg': error_msg_no_email_info
                     }
                     self._unsuccess_insert_list.append(user_detail)
