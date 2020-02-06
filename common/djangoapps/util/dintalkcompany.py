@@ -159,7 +159,12 @@ class Dingtalkuserinfo:
     def _get_access_token(self):
         data = self.deal_url_encode(self.access_token_url_param)
         access_token_url = ACCESS_TOKEN_URL + "?" + data
-        return self.get_request_data(access_token_url)['access_token']
+        res = self.get_request_data(access_token_url)
+        if 'access_token' in res:
+            return res['access_token']
+        
+        log.error('dingtalk access token get error, dingtalk server msg: ' + str(res))
+        return None
 
     def deal_url_encode(self, param):
         return urllib.urlencode(param)
@@ -168,6 +173,7 @@ class Dingtalkuserinfo:
         try:
             res = requests.request('get', url)
             res = json.loads(res.content)
+            log.info({'url': url, 'type': 'get', 'result': str(res)})
             if 'errcode' in res:
                 if res['errcode'] == 0:
                     return res
