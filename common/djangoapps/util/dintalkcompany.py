@@ -1,6 +1,5 @@
 #coding=utf8
 import sys
-import os
 import json
 import urllib
 import requests
@@ -122,7 +121,7 @@ class Dingtalkuserinfo:
         for userid in self._user_id_list:
             data = self._get_user_detail_data(userid)
             if data:
-                if 'email' not in data or data['email'] == '':
+                if ('email' not in data or data['email'] == '') and ('orgEmail' not in data or data['orgEmail'] == ""):
                     user_detail = {
                         'name': data['name'],
                         'msg': error_msg_no_email_info
@@ -187,7 +186,10 @@ class Dingtalkuserinfo:
     def _clean_data(self, data):
         new_data = {}
         new_data['unionid'] = data['unionid']
-        new_data['email'] = data['email']
+        if 'orgEmail' in data and data['orgEmail'] != '':
+            new_data['email'] = data['orgEmail']
+        else:
+            new_data['email'] = data['email']
         new_data['real_name'] = data['name']
         s = ''
         for i in pypinyin.pinyin(data['name'], style=pypinyin.NORMAL):
@@ -223,8 +225,8 @@ class Dingtalkuserinfo:
                     data['name'] = data['name'] + str(random.randint(0, 100))
 
                 sql = """
-                    insert into auth_user(password,last_login,is_superuser,username,email,is_staff,is_active,date_joined) values \
-                    ('pbkdf2_sha256$36000$hGRbvCdc8t1e$QJcK3qNinTn7+WC0TFnrt+ovXSzywyzQhRouaYDMegA=','{last_login}',0,'{name}','{email}',0,1,'{date_joined}');
+                    insert into auth_user(password,last_login,is_superuser,username,email,is_staff,is_active,date_joined, first_name, last_name) values \
+                    ('pbkdf2_sha256$36000$hGRbvCdc8t1e$QJcK3qNinTn7+WC0TFnrt+ovXSzywyzQhRouaYDMegA=','{last_login}',0,'{name}','{email}',0,1,'{date_joined}', '', '');
                 """.format(last_login=now_time, name=data['name'], email=data['email'], date_joined=now_time)
                 cursor.execute(sql)
                 user_id = cursor.lastrowid
@@ -236,8 +238,8 @@ class Dingtalkuserinfo:
                 cursor.execute(sql)
 
                 sql = """
-                    insert into auth_userprofile(name,courseware,gender,level_of_education, mailing_address, city, country, goals, allow_certificate, user_id) values \
-                    ('{name}', 'course.xml','','','','','','',1,{user_id});
+                    insert into auth_userprofile(name,courseware,gender,level_of_education, mailing_address, city, country, goals, allow_certificate, user_id, meta, language, location) values \
+                    ('{name}', 'course.xml', '', '', '', '', '', '', 1, {user_id}, '', '', '');
                 """.format(name=data['real_name'], user_id=user_id)
                 cursor.execute(sql)
 
