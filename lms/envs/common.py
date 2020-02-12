@@ -407,6 +407,8 @@ FEATURES = {
 
     # Whether to display the account deletion section the account settings page
     'ENABLE_ACCOUNT_DELETION': True,
+    
+    "THIRD_PARTY_AUTH_HINT": "oa2-dingtalk"
 }
 
 # Settings for the course reviews tool template and identification key, set either to None to disable course reviews
