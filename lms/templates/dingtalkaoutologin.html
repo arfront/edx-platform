@@ -1,0 +1,32 @@
+<%page expression_filter="h"/>
+<%inherit file="main.html" />
+<%namespace name='static' file='static_content.html'/>
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+%>
+
+
+<p style="text-align: center; margin-bottom: 20px;">
+    ${result}
+    <span id="lblCount">5</span>${_("s later, here to go to the home page")}<a href="/" title="">${_("Go to home page")}</a>
+</p>
+
+
+<script type="text/javascript">
+$(function () {
+    var seconds = 5;
+    $("#lblCount").html(seconds);
+    setInterval(function () {
+      seconds--;
+      $("#lblCount").html(seconds);
+      if (seconds == 0) {
+        $("#dvCountDown").hide();
+        window.location = "/";
+      }
+    }, 1000);
+}, );
+</script>
+
+
+

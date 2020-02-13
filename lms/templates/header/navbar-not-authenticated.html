@@ -63,9 +63,12 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
            <div class="mobile-nav-item hidden-mobile nav-item">
             <a class="btn" href="${support_link}" target="_blank">${_("Help and Support")}</a>
            </div>
-          <div class="mobile-nav-item hidden-mobile nav-item">
+            <div class="mobile-nav-item hidden-mobile nav-item">
+             <a href="#" class="btn no-login-btn">${_("No login in Dingtalk")}</a>
+           </div>
+           <div class="mobile-nav-item hidden-mobile nav-item">
             <a class="sign-in-btn btn" href="/login${login_query()}">${_("Sign in")}</a>
-          </div>
+           </div>
         % endif
       % endif
     </div>
