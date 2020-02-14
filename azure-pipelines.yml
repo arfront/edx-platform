@@ -58,13 +58,13 @@ steps:
 - task: Docker@2
   displayName: 'Login docker hub'
   inputs:
-    containerRegistry: 'harbor'
+    containerRegistry: 'docker-arfront'
     command: 'login'
 
 - task: CmdLine@2
   displayName: 'Tutor config'
   inputs:
-    script: 'tutor config save --set DOCKER_IMAGE_OPENEDX=harbor.arfront.cn/kh-academy/kh-academy:latest'
+    script: 'tutor config save --set DOCKER_IMAGE_OPENEDX=arfront/kh-academy:latest'
     workingDirectory: '$(System.ArtifactsDirectory)'
 
 - task: CmdLine@2
@@ -75,10 +75,20 @@ steps:
 - task: CmdLine@2
   displayName: 'Tag openedx image with build id'
   inputs:
-    script: 'docker tag harbor.arfront.cn/kh-academy/kh-academy:latest harbor.arfront.cn/kh-academy/kh-academy:$(Build.BuildId)'
+    script: 'docker tag arfront/kh-academy:latest arfront/kh-academy:$(Build.BuildId)'
 
 - task: CmdLine@2
   inputs:
     script: |
-      docker push harbor.arfront.cn/kh-academy/kh-academy:latest
-      docker push harbor.arfront.cn/kh-academy/kh-academy:$(Build.BuildId)
+      docker push arfront/kh-academy:latest
+      docker push arfront/kh-academy:$(Build.BuildId)
+steps:
+- task: SSH@0
+  displayName: 'Synchronous images to harbor'
+  inputs:
+    sshEndpoint: 'agent-ningxia'
+    commands: |
+     docker pull arfront/kh-academy:$(Build.BuildId)
+     docker tag  arfront/kh-academy:$(Build.BuildId) harbor.arfront.cn/kh-academy/kh-academy:$(Build.BuildId) harbor.arfront.cn/kh-academy/kh-academy:latest 
+     docker push harbor.arfront.cn/kh-academy/kh-academy:$(Build.BuildId)
+     docker push harbor.arfront.cn/kh-academy/kh-academy:latest
