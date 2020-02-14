@@ -88,7 +88,8 @@ steps:
   inputs:
     sshEndpoint: 'agent-ningxia'
     commands: |
-     docker pull arfront/kh-academy:$(Build.BuildId)
-     docker tag  arfront/kh-academy:$(Build.BuildId) harbor.arfront.cn/kh-academy/kh-academy:$(Build.BuildId) harbor.arfront.cn/kh-academy/kh-academy:latest 
-     docker push harbor.arfront.cn/kh-academy/kh-academy:$(Build.BuildId)
-     docker push harbor.arfront.cn/kh-academy/kh-academy:latest
+      docker pull arfront/kh-academy:$(Build.BuildId)
+      docker tag  arfront/kh-academy:$(Build.BuildId) harbor.arfront.cn/kh-academy/kh-academy:$(Build.BuildId) 
+      docker tag  arfront/kh-academy:$(Build.BuildId) harbor.arfront.cn/kh-academy/kh-academy:latest 
+      docker push harbor.arfront.cn/kh-academy/kh-academy:$(Build.BuildId)
+      docker push harbor.arfront.cn/kh-academy/kh-academy:latest
