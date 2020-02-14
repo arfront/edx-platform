@@ -11,6 +11,7 @@ class DingtalkUserconfig(ConfigurationModel):
 
     key = models.TextField(blank=True, verbose_name="Client ID")
     secret = models.TextField(blank=True, verbose_name="Client Secret")
+    corpId = models.TextField(blank=True, verbose_name='corpId')
 
     class Meta:
         app_label = "dingtalkuser"
@@ -27,4 +28,8 @@ class DingtalkUserconfig(ConfigurationModel):
             if self.secret:
                 return self.secret
             return getattr(settings, 'DINGTALK_APP_SECRET', '')
+        if name == "CORPID":
+            if self.corpId:
+                return self.corpId
+            return getattr(settings, 'CORPID', '')
         raise KeyError

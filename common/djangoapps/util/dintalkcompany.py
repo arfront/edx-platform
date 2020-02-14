@@ -26,6 +26,7 @@ USER_DEPARTMENT_LISTIDS_URL = 'https://oapi.dingtalk.com/department/list_ids'
 USER_LIST_IDS_LIST_URL = 'https://oapi.dingtalk.com/user/getDeptMember'
 USER_DETAIL_URL = 'https://oapi.dingtalk.com/user/get'
 USER_ID_BY_UNIONID_URL = 'https://oapi.dingtalk.com/user/getUseridByUnionid'
+AUTO_LOGIN_USER_INFO_URL = "https://oapi.dingtalk.com/user/getuserinfo"
 
 error_msg_no_email_info = _('No email information')
 error_msg_user_existed_in_database = _('User existed in databases')
@@ -79,6 +80,10 @@ class Dingtalkuserinfo:
         self.user_detail_url_param = {
             'access_token': self._token,
             'userid': ''
+        }
+        self.auto_login_user_info_param = {
+            'access_token': self._token,
+            'code': ''
         }
         self._unsuccess_insert_list = []
         self._success_insert_list = []
@@ -167,6 +172,23 @@ class Dingtalkuserinfo:
 
     def deal_url_encode(self, param):
         return urllib.urlencode(param)
+    
+    def get_unionid_from_code(self, code):
+        self.auto_login_user_info_param['code'] = code
+        data = self.deal_url_encode(self.auto_login_user_info_param)
+        auto_login_url = AUTO_LOGIN_USER_INFO_URL + "?" + data
+        res = self.get_request_data(auto_login_url)
+        if res and 'userid' in res:
+            userid = res['userid']
+        else:
+            return None
+        
+        res = self._get_user_detail_data(userid)
+        if res  and 'unionid' in res:
+            unionid = res['unionid']
+            return unionid
+        else:
+            return None
 
     def get_request_data(self, url):
         try:

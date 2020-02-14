@@ -15,6 +15,9 @@ from django.urls import reverse
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
+from django.contrib.auth import models, login
+from django.db import connections
+from django.http.response import HttpResponseRedirect, HttpResponseForbidden
 from edx_django_utils import monitoring as monitoring_utils
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
@@ -57,8 +60,80 @@ from student.models import (
 )
 from util.milestones_helpers import get_pre_requisite_courses_not_completed
 from xmodule.modulestore.django import modulestore
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from dingtalkuser.models import DingtalkUserconfig
+from util.dintalkcompany import Dingtalkuserinfo, dictfetchall
+
 
 log = logging.getLogger("edx.student")
+
+
+class DingtalkcompanyInfoView(APIView):
+    
+    def get(self, request):
+        config = DingtalkUserconfig.current()
+        if config.enabled:
+            corpId = config.get_setting('CORPID')
+            return Response({'corpId': corpId, 'status': 10001, 'msg': 'success'}, status=status.HTTP_200_OK)
+        
+        return Response({'status': 10002, 'msg': 'fail'})
+
+
+class Dingtalkautologiniew(APIView):
+    
+    def get(self, request):
+        content = {
+            'result': _('Login failed')
+        }
+        code = request.GET.get('code')
+        if not code or code == '':
+            log.error("Get dingtalk access code fail")
+            return render_to_response('dingtalkaoutologin.html', content)
+        
+        config = DingtalkUserconfig.current()
+        if config.enabled:
+            accessKey = config.get_setting('KEY')
+            appSecret = config.get_setting('SECRET')
+        else:
+            log.error("No config can be used")
+            return render_to_response('dingtalkaoutologin.html', content)
+
+        if accessKey == '' or appSecret == '':
+            log.error("accesskey and appsecret are null")
+            return render_to_response('dingtalkaoutologin.html', content)
+        
+        dingtalk_user_info = Dingtalkuserinfo(accessKey, appSecret)
+        unionid = dingtalk_user_info.get_unionid_from_code(code)
+        if not unionid:
+            log.error("Get unionid id failed")
+            return render_to_response('dingtalkaoutologin.html', content)
+
+        cursor = self._db_cursor()
+        sql = """
+            select * from social_auth_usersocialauth where uid='{uid}'
+        """.format(uid=unionid)
+        cursor.execute(sql)
+        result = dictfetchall(cursor)
+        if result:
+            user_id = int(result[0]['user_id'])
+        else:
+            content['result'] = _("The user not in KH&academy, Login failed")
+            return render_to_response('dingtalkaoutologin.html', content)
+        
+        user = models.User.objects.get(id=user_id)
+        user.backend = 'django.contrib.auth.backends.ModelBackend'
+        login(request, user)
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+    
+    def _db_cursor(self):
+        db_alias = (
+            'read_replica'
+            if 'read_replica' in settings.DATABASES
+            else 'default'
+        )
+        return connections[db_alias].cursor()
 
 
 def get_org_black_and_whitelist_for_site():

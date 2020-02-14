@@ -44,6 +44,14 @@ urlpatterns = [
         views.activate_secondary_email,
         name='activate_secondary_email'
     ),
+    url(
+        r'^api/getdingtalkcompanycorpId/$',
+        views.DingtalkcompanyInfoView.as_view()
+    ),
+    url(
+        r'^dingtalkautologin/$',
+        views.Dingtalkautologiniew.as_view()
+    ),
 
 ]
 

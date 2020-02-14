@@ -22,6 +22,8 @@ $(document).ready(function() {
     'use strict';
     var $hamburgerMenu;
     var $mobileMenu;
+    var $code;
+    var $dingtalkcorpid;
     // Toggling visibility for the user dropdown
     $('.global-header .toggle-user-dropdown, .global-header .toggle-user-dropdown span').click(function(e) {
         var $dropdownMenu = $('.global-header .nav-item .dropdown-user-menu');
@@ -49,6 +51,39 @@ $(document).ready(function() {
             }
         });
     }
+
+    $('.no-login-btn').click(function () {
+        if (dd.env.platform=="notInDingTalk") {
+          alert("请用钉钉打开！");
+        } else {
+          var host=window.location.host;
+          var protocolStr = document.location.protocol;
+          $.ajax({
+            url: protocolStr+ '//' + host + "/api/getdingtalkcompanycorpId/",
+            type: "get",
+            async: false,
+            success: function (info) {
+              if(info['status'] == '10001') {
+                $dingtalkcorpid = info['corpId'];
+              } else {
+                alert(info['msg'])
+              }
+            }
+          });
+          dd.ready(function() {
+              dd.runtime.permission.requestAuthCode({
+                  corpId: $dingtalkcorpid, // 企业id
+                  onSuccess: function (info) {
+                      $code = info.code; // 通过该免登授权码可以获取用户身份
+                      window.location.href = protocolStr+ '//' + host + '/dingtalkautologin/?code=' + $code;
+                  },
+                  onerror: function (info) {
+                      $('#wryloveid').val(info);
+                  }
+              });
+          });
+        }
+    });
 
     // Toggling menu visibility with the hamburger menu
     $('.global-header .hamburger-menu').click(function() {
