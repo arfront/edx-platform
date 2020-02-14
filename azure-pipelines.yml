@@ -82,7 +82,7 @@ steps:
     script: |
       docker push arfront/kh-academy:latest
       docker push arfront/kh-academy:$(Build.BuildId)
-steps:
+
 - task: SSH@0
   displayName: 'Synchronous images to harbor'
   inputs:
