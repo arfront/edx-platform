@@ -70,15 +70,15 @@ from util.dintalkcompany import Dingtalkuserinfo, dictfetchall
 log = logging.getLogger("edx.student")
 
 
-class DingtalkcompanyInfoView(APIView):
-    
-    def get(self, request):
-        config = DingtalkUserconfig.current()
-        if config.enabled:
-            corpId = config.get_setting('CORPID')
-            return Response({'corpId': corpId, 'status': 10001, 'msg': 'success'}, status=status.HTTP_200_OK)
-        
-        return Response({'status': 10002, 'msg': 'fail'})
+def showdingtalkautologinjumppage(request):
+    config = DingtalkUserconfig.current()
+    if config.enabled:
+        corpId = config.get_setting('CORPID')
+
+    content = {
+        'corpId': corpId
+    }
+    return render_to_response('dingtalkautologinjumppage.html', content)
 
 
 class Dingtalkautologiniew(APIView):
@@ -125,7 +125,7 @@ class Dingtalkautologiniew(APIView):
         user = models.User.objects.get(id=user_id)
         user.backend = 'django.contrib.auth.backends.ModelBackend'
         login(request, user)
-        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+        return HttpResponseRedirect('/')
     
     def _db_cursor(self):
         db_alias = (

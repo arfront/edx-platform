@@ -1,0 +1,37 @@
+<%page expression_filter="h"/>
+<%inherit file="main.html" />
+<%namespace name='static' file='static_content.html'/>
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+%>
+
+<p>${_("Waiting, please wait")}.....</p>
+<script src="https://g.alicdn.com/dingding/dingtalk-jsapi/2.7.13/dingtalk.open.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        var $code;
+        var host=window.location.host;
+        var protocolStr = document.location.protocol;
+        if (dd.env.platform == "notInDingTalk") {
+            alert("请用钉钉打开！");
+            window.location.href = protocolStr+ '//' + host + '/';
+        } else {
+            dd.ready(function() {
+                dd.runtime.permission.requestAuthCode({
+                    corpId: '${corpId}', // 企业id
+                    onSuccess: function (info) {
+                        $code = info.code; // 通过该免登授权码可以获取用户身份
+                        window.location.href = protocolStr+ '//' + host + '/dingtalkautologin/?code=' + $code;
+                    },
+                    onerror: function (info) {
+                        alert(info)
+                    }
+                });
+            });
+        }
+    });
+</script>
+
+
+

@@ -45,14 +45,13 @@ urlpatterns = [
         name='activate_secondary_email'
     ),
     url(
-        r'^api/getdingtalkcompanycorpId/$',
-        views.DingtalkcompanyInfoView.as_view()
-    ),
-    url(
         r'^dingtalkautologin/$',
         views.Dingtalkautologiniew.as_view()
     ),
-
+    url(
+        r'^showdingtalkautologinjumppage/$',
+        views.showdingtalkautologinjumppage
+    ),
 ]
 
 # password reset django views (see above for password reset views)
