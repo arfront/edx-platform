@@ -433,9 +433,15 @@ def _get_file_metadata_as_dictionary(upload_file):
     # using the 'filename' nomenclature since we're using a FileSystem paradigm
     # here; we're just imposing the Location string formatting expectations to
     # keep things a bit more consistent
+    # import pypinyin
+    # name = ''
+    # for i in pypinyin.pinyin(upload_file.name, style=pypinyin.NORMAL):
+    #     name += ''.join(i)
+
     return {
         'upload_file': upload_file,
         'filename': upload_file.name,
+        # 'filename': name,
         'mime_type': upload_file.content_type,
         'upload_file_size': get_file_size(upload_file)
     }

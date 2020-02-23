@@ -1,3 +1,4 @@
+#-*- coding:utf-8 -*-
 """
 MongoDB/GridFS-level code for the contentstore.
 """
@@ -165,10 +166,12 @@ class MongoContentStore(ContentStore):
         # Escape invalid char from filename.
         export_name = escape_invalid_characters(name=filename, invalid_char_list=['/', '\\'])
 
-        disk_fs = OSFS(output_directory)
-
-        with disk_fs.open(export_name, 'wb') as asset_file:
+        # disk_fs = OSFS(output_directory)
+        with open(str(output_directory).encode('utf-8') + export_name.encode('utf-8'), 'wb') as asset_file:
             asset_file.write(content.data)
+
+        # with disk_fs.open(export_name.encode("gbk").decode('gbk'), 'wb') as asset_file:
+        #     asset_file.write(content.data)
 
     def export_all_for_course(self, course_key, output_directory, assets_policy_file):
         """

@@ -650,7 +650,7 @@ def create_export_tarball(course_module, course_key, context, status=None):
             status.increment_completed_steps()
         LOGGER.debug(u'tar file being generated at %s', export_file.name)
         with tarfile.open(name=export_file.name, mode='w:gz') as tar_file:
-            tar_file.add(root_dir / name, arcname=name)
+            tar_file.add((root_dir / name).encode('utf-8'), arcname=name.encode('utf-8'))
 
     except SerializationError as exc:
         LOGGER.exception(u'There was an error exporting %s', course_key, exc_info=True)
@@ -685,7 +685,7 @@ def create_export_tarball(course_module, course_key, context, status=None):
         raise
     finally:
         if os.path.exists(root_dir / name):
-            shutil.rmtree(root_dir / name)
+            shutil.rmtree((root_dir / name).encode('utf-8'))
 
     return export_file
 
