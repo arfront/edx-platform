@@ -123,7 +123,7 @@ FEATURES = {
     'SHIB_DISABLE_TOS': False,
 
     # Toggles OAuth2 authentication provider
-    'ENABLE_OAUTH2_PROVIDER': False,
+    'ENABLE_OAUTH2_PROVIDER': True,
 
     # Allows to enable an API endpoint to serve XBlock view, used for example by external applications.
     # See jquey-xblock: https://github.com/edx-solutions/jquery-xblock
@@ -267,10 +267,10 @@ FEATURES = {
 
     # Expose Mobile REST API. Note that if you use this, you must also set
     # ENABLE_OAUTH2_PROVIDER to True
-    'ENABLE_MOBILE_REST_API': False,
+    'ENABLE_MOBILE_REST_API': True,
 
     # Enable the combined login/registration form
-    'ENABLE_COMBINED_LOGIN_REGISTRATION': False,
+    'ENABLE_COMBINED_LOGIN_REGISTRATION': True,
     'ENABLE_COMBINED_LOGIN_REGISTRATION_FOOTER': False,
 
     # Enable organizational email opt-in
@@ -537,6 +537,9 @@ OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth2_provider.Application'
 # Automatically clean up edx-django-oauth2-provider tokens on use
 OAUTH_DELETE_EXPIRED = True
 OAUTH_ID_TOKEN_EXPIRATION = 60 * 60
+
+# If you are running in a non-SSL environment, you can set "OAUTH_ENFORCE_SECURE": false. This configuration setting should never be set to false in anything other than a development environment.
+#OAUTH_ENFORCE_SECURE = True
 
 ################################## THIRD_PARTY_AUTH CONFIGURATION #############################
 TPA_PROVIDER_BURST_THROTTLE = '10/min'
