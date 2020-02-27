@@ -135,7 +135,8 @@ edx-i18n-tools==0.4.6
 edx-lint==1.0.0
 edx-milestones==0.1.13
 edx-oauth2-provider==1.2.2
-edx-opaque-keys[django]==0.4.4
+#edx-opaque-keys[django]==0.4.4
+git+https://github.com/arfront/opaque-keys.git@master-v0.4.4-supportchinese
 edx-organizations==1.0.0
 edx-proctoring-proctortrack==1.0.1
 edx-proctoring==1.5.7

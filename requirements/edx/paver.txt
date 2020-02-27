@@ -8,7 +8,8 @@ argh==0.26.2              # via watchdog
 argparse==1.4.0           # via stevedore
 certifi==2018.11.29       # via requests
 chardet==3.0.4            # via requests
-edx-opaque-keys==0.4.4
+#edx-opaque-keys==0.4.4
+git+https://github.com/arfront/opaque-keys.git@master-v0.4.4-supportchinese
 idna==2.8                 # via requests
 lazy==1.1
 libsass==0.10.0

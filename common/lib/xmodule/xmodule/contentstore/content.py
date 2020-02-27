@@ -17,7 +17,7 @@ import StringIO
 from urlparse import urlparse, urlunparse, parse_qsl
 from urllib import urlencode, quote_plus
 
-from opaque_keys.edx.locator import AssetLocator
+from opaque_keys.edx.locator import AssetLocator, Locator
 from opaque_keys.edx.keys import CourseKey, AssetKey
 from opaque_keys import InvalidKeyError
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -80,9 +80,15 @@ class StaticContent(object):
             asset
         """
         path = path.replace('/', '_')
+        AssetLocator.DEPRECATED_INVALID_CHARS = re.compile(r"[^\w.%-[\u4e00-\u9fa5]]", re.UNICODE)
+  
+        course_key.ALLOWED_ID_CHARS = r'[\w\-~.:[\u4e00-\u9fa5]]'
+        Locator.DEPRECATED_ALLOWED_ID_CHARS = r'[\w\-~.:%[\u4e00-\u9fa5]]'
+        course_key.DEPRECATED_ALLOWED_ID_RE = re.compile(r'^[\w\-~.:%(\u4e00-\u9fa5)]+', re.UNICODE)
+        
         return course_key.make_asset_key(
             'asset' if not is_thumbnail else 'thumbnail',
-            AssetLocator.clean_keeping_underscores(path)
+            AssetLocator.clean_keeping_underscores(path.encode('utf-8'))
         ).for_branch(None)
 
     def get_id(self):
@@ -458,7 +464,8 @@ class ContentStore(object):
         except Exception, exc:  # pylint: disable=broad-except
             # log and continue as thumbnails are generally considered as optional
             logging.exception(
-                u"Failed to generate thumbnail for {0}. Exception: {1}".format(content.location, str(exc))
+                # u"Failed to generate thumbnail for {0}. Exception: {1}".format(content.location, str(exc))
+                u"Failed to generate thumbnail for. Exception: {0}".format(str(exc))
             )
 
         return thumbnail_content, thumbnail_file_location

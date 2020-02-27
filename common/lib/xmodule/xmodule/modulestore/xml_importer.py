@@ -100,7 +100,7 @@ class StaticContentImporter:
     def import_static_content_directory(self, content_subdir=DEFAULT_STATIC_CONTENT_SUBDIR, verbose=False):
         remap_dict = {}
 
-        static_dir = self.course_data_path / content_subdir
+        static_dir = (self.course_data_path / content_subdir).encode('utf-8')
         for dirname, _, filenames in os.walk(static_dir):
             for filename in filenames:
 
