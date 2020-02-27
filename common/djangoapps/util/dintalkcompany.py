@@ -30,6 +30,7 @@ AUTO_LOGIN_USER_INFO_URL = "https://oapi.dingtalk.com/user/getuserinfo"
 
 error_msg_no_email_info = _('No email information')
 error_msg_user_existed_in_database = _('User existed in databases')
+error_msg_email_existed_in_database = _("Email existed in database")
 error_msg_fail_to_get_the_number_of_users = _('Failed to get the number of users')
 error_msg_fail_to_get_user_list = _('Failed to get user list')
 success_msg_sychornous_user_successful = _('Synchronous user successful')
@@ -135,7 +136,7 @@ class Dingtalkuserinfo:
                     continue
                     
                 data = self._clean_data(data)
-                self._create_user_to_database(data)
+                self._create_user_to_database(data, 'dingtalk')
 
         result = {
             'status': 10001,
@@ -164,7 +165,7 @@ class Dingtalkuserinfo:
         data = self.deal_url_encode(self.access_token_url_param)
         access_token_url = ACCESS_TOKEN_URL + "?" + data
         res = self.get_request_data(access_token_url)
-        if 'access_token' in res:
+        if isinstance(res, dict)  and 'access_token' in res:
             return res['access_token']
         
         log.error('dingtalk access token get error, dingtalk server msg: ' + str(res))
@@ -220,23 +221,24 @@ class Dingtalkuserinfo:
 
         return new_data
 
-    def _create_user_to_database(self, data):
+    def _create_user_to_database(self, data, type):
         cursor = self._db_cursor()
         try:
             with transaction.atomic():
                 now_time = datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')
-                sql = """
-                    select * from social_auth_usersocialauth where uid='{uid}'
-                """.format(uid=data['unionid'])
-                cursor.execute(sql)
-                result = dictfetchall(cursor)
-                if result:
-                    user_detail = {
-                        'name': data['real_name'],
-                        'msg': error_msg_user_existed_in_database
-                    }
-                    self._unsuccess_insert_list.append(user_detail)
-                    return True
+                if type == 'dingtalk':
+                    sql = """
+                        select * from social_auth_usersocialauth where uid='{uid}'
+                    """.format(uid=data['unionid'])
+                    cursor.execute(sql)
+                    result = dictfetchall(cursor)
+                    if result:
+                        user_detail = {
+                            'name': data['real_name'],
+                            'msg': error_msg_user_existed_in_database
+                        }
+                        self._unsuccess_insert_list.append(user_detail)
+                        return True
 
                 sql = """
                     select * from auth_user where username='{username}'
@@ -245,10 +247,24 @@ class Dingtalkuserinfo:
                 result = dictfetchall(cursor)
                 if result:
                     data['name'] = data['name'] + str(random.randint(0, 100))
+                    
+                
+                sql = """
+                    select * from auth_user where email='{email}'
+                """.format(email=data['email'])
+                cursor.execute(sql)
+                result = dictfetchall(cursor)
+                if result:
+                    user_detail = {
+                        'name': data['real_name'],
+                        'msg': error_msg_email_existed_in_database
+                    }
+                    self._unsuccess_insert_list.append(user_detail)
+                    return True
 
                 sql = """
-                    insert into auth_user(password,last_login,is_superuser,username,email,is_staff,is_active,date_joined, first_name, last_name) values \
-                    ('pbkdf2_sha256$36000$hGRbvCdc8t1e$QJcK3qNinTn7+WC0TFnrt+ovXSzywyzQhRouaYDMegA=','{last_login}',0,'{name}','{email}',0,1,'{date_joined}', '', '');
+                    insert into auth_user(password, last_login, is_superuser, username, email, is_staff, is_active, date_joined, first_name, last_name) values \
+                    ('pbkdf2_sha256$36000$5MWWT8MF6gMs$AJlC7Ff/0Dkg5rCw5Mnom/6BQjqAf8kPen836uvyGtg=','{last_login}',0,'{name}','{email}',0,1,'{date_joined}', '', '');
                 """.format(last_login=now_time, name=data['name'], email=data['email'], date_joined=now_time)
                 cursor.execute(sql)
                 user_id = cursor.lastrowid
@@ -264,11 +280,12 @@ class Dingtalkuserinfo:
                     ('{name}', 'course.xml', '', '', '', '', '', '', 1, {user_id}, '', '', '');
                 """.format(name=data['real_name'], user_id=user_id)
                 cursor.execute(sql)
-
-                sql = """
-                    insert into social_auth_usersocialauth(provider, uid, extra_data, user_id) values('DingTalk','{uid}','', {user_id});
-                """.format(uid=data['unionid'], user_id=user_id)
-                cursor.execute(sql)
+                
+                if type == 'dingtalk':
+                    sql = """
+                        insert into social_auth_usersocialauth(provider, uid, extra_data, user_id) values('DingTalk','{uid}','', {user_id});
+                    """.format(uid=data['unionid'], user_id=user_id)
+                    cursor.execute(sql)
 
                 sql = """
                     insert into user_api_userpreference(`key`,value,user_id) values('pref-lang','zh-cn', {user_id});
@@ -283,6 +300,7 @@ class Dingtalkuserinfo:
 
         except Exception:
             log.error(traceback.format_exc())
+            
             return False
 
         return True
@@ -294,6 +312,20 @@ class Dingtalkuserinfo:
             else 'default'
         )
         return connections[db_alias].cursor()
+    
+    def import_user_from_file_data(self, data):
+        for i in data:
+            self._create_user_to_database(i, 'csvfile')
+
+        result = {
+            'status': 10001,
+            'msg': success_msg_sychornous_user_successful,
+            'result': {
+                'success_user_info': self._success_insert_list,
+                'fail_user_info': self._unsuccess_insert_list
+            }
+        }
+        return result
     
     def delete_leave_job_people(self):
         '''
@@ -339,3 +371,8 @@ class Dingtalkuserinfo:
             log.error(traceback.format_exc())
         
         return None
+    
+    def import_user_from_data(self, path):
+        
+        return
+        
