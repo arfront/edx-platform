@@ -366,6 +366,6 @@ git+https://github.com/MarCnu/pdfXBlock.git@master
 # audio
 git+https://github.com/pmitros/AudioXBlock.git@master
 # voice recognizer xblock
-git+https://github.com/perpetualny/voicerecxblock.git@master
+git+https://github.com/eduStack/voice-recognizer-xblock.git@master
 # Group project
 #-e git+https://github.com/open-craft/xblock-group-project-v2.git@0.4.9#egg=xblock-group-project-v2

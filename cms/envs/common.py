@@ -396,7 +396,7 @@ TEMPLATES = [
             ),
             'context_processors': CONTEXT_PROCESSORS,
             # Change 'debug' in your environment settings files - not here.
-            'debug': False
+            'debug': False,
         }
     },
     {
