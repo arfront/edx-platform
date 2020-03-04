@@ -5,6 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import views, response, status, permissions
 from util.dintalkcompany import Dingtalkuserinfo
 from dingtalkuser.models import DingtalkUserconfig
+from arfrontconfig.models import WeihouaccountConfig
 
 log = logging.getLogger(__name__)
 
@@ -13,6 +14,7 @@ error_msg_no_secret_or_key_in_config = _('No secret or key in config')
 success_msg_successfully_deleted_user = _('Successfully deleted users')
 success_msg_no_users_to_delete = _('No users to delete')
 success_msg_import_user = _('Success Import user')
+error_msg_no_config_of_weihou_can_be_used = _('No config of dingtalk can be used')
 
 class GetuserfromDingTalkView(views.APIView):
     permission_classes = (permissions.IsAdminUser,)
@@ -83,3 +85,33 @@ class ImportUserfromfileView(views.APIView):
         res = user_info.import_user_from_file_data(data_list)
         
         return response.Response(res, status=status.HTTP_200_OK)
+        
+class WeiHouaccountView(views.APIView):
+    
+    def get(self, request):
+        config = WeihouaccountConfig.current()
+        if config.enabled:
+            username = config.username
+            password = config.password
+        else:
+            return response.Response({'status': 10002, 'msg': error_msg_no_config_of_weihou_can_be_used}, status=status.HTTP_400_BAD_REQUEST)
+        if request.META['REMOTE_ADDR'] in ['127.0.0.1', 'localhost']:
+            data = {
+                'username': username,
+                'password': password
+                # 'username': 's45311060',
+                # 'password': 'wry19950107'
+            }
+            res = {
+                'status': 10001,
+                'msg': 'Get weihou account success',
+                'data': data
+            }
+        else:
+            res = {
+                'status': 10002,
+                'res': 'failed',
+                'msg': 'only localhost allowed'
+            }
+        return response.Response(res, status=status.HTTP_200_OK)
+        

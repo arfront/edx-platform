@@ -1993,7 +1993,7 @@ msgstr "插入/编辑图片"
 
 #: common/lib/xmodule/xmodule/js/src/lti/lti.js
 msgid ""
-"Click OK to have your username and e-mail address sent to a 3rd party application.\n"
+"jiangClick OK to have your username and e-mail address sent to a 3rd party application.\n"
 "\n"
 "Click Cancel to return to this page without sending your information."
 msgstr ""

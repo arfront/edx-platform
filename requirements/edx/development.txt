@@ -365,7 +365,7 @@ git+https://github.com/MarCnu/pdfXBlock.git@master
 -e common/lib/xblock_3d_viewer/mt3d
 # audio
 git+https://github.com/pmitros/AudioXBlock.git@master
-# voice recognizer xblock
-git+https://github.com/perpetualny/voicerecxblock.git@master
 # Group project
 #-e git+https://github.com/open-craft/xblock-group-project-v2.git@0.4.9#egg=xblock-group-project-v2
+# livevideo
+git+https://github.com/wrydeveloper/livevideo_xblock.git@develop
