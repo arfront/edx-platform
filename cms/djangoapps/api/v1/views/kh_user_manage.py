@@ -55,6 +55,7 @@ class RemoveleavejobuserView(views.APIView):
         
 
 class ImportUserfromfileView(views.APIView):
+    permission_classes = (permissions.IsAdminUser,)
     
     def post(self, request):
         print(request.FILES)

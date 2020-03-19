@@ -24696,3 +24696,8 @@ msgstr "检测到您在钉钉内打开,是否登录?"
 msgid "Waiting, please wait"
 msgstr "等待中，请稍后"
 
+msgid "Email existed in database"
+msgstr "该email已经存在，无法继续录入该用户"
+
+msgid "Import User from csv file"
+msgstr "从csv文件导入用户"
