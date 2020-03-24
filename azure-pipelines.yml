@@ -1,13 +1,7 @@
 trigger:
 - ironwood-master
 
-pool:
-  vmImage: 'ubuntu-latest'
-strategy:
-  matrix:
-    Python36:
-      PYTHON_VERSION: '3.6'
-  maxParallel: 3
+pool: 'docker'
 
 steps:
 - task: UsePythonVersion@0
@@ -49,17 +43,6 @@ steps:
       export LANG=C.UTF-8
       pip3 install -e .
     workingDirectory: '$(Pipeline.Workspace)'
-
-- task: DockerInstaller@0
-  displayName: 'Install docker CLI'
-  inputs:
-    dockerVersion: '17.09.0-ce'
-
-- task: Docker@2
-  displayName: 'Login docker hub'
-  inputs:
-    containerRegistry: 'docker-arfront'
-    command: 'login'
 
 - task: CmdLine@2
   displayName: 'Tutor config'

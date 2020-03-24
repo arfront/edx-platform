@@ -17,3 +17,15 @@ class Youtubeaccountconfig(ConfigurationModel):
         app_label = "arfrontconfig"
         verbose_name = "Youtube account(h5 page)"
         verbose_name_plural = verbose_name
+
+
+class WeihouaccountConfig(ConfigurationModel):
+    
+    username = models.TextField(blank=True, verbose_name='User')
+    password = models.TextField(blank=True, verbose_name='Password')
+    
+    class Meta:
+        db_table = "weihouaccountconfig"
+        app_label = "arfrontconfig"
+        verbose_name = "Weihou account"
+        verbose_name_plural = verbose_name
