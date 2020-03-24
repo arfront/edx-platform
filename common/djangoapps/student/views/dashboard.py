@@ -17,7 +17,7 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.contrib.auth import models, login
 from django.db import connections
-from django.http.response import HttpResponseRedirect, HttpResponseForbidden
+from django.http.response import HttpResponseRedirect
 from edx_django_utils import monitoring as monitoring_utils
 from opaque_keys.edx.keys import CourseKey
 from pytz import UTC
