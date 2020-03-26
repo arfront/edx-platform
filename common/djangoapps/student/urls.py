@@ -7,6 +7,7 @@ from django.conf.urls import url
 from django.contrib.auth.views import password_reset_complete
 
 from . import views
+from cms.djangoapps.api.v1.views.kh_user_manage import GetfullnamefromusernameView
 
 urlpatterns = [
 
@@ -52,6 +53,10 @@ urlpatterns = [
         r'^showdingtalkautologinjumppage/$',
         views.showdingtalkautologinjumppage
     ),
+    url(
+        r'^api/v1/getfullnamefromusername/',
+        GetfullnamefromusernameView.as_view()
+    )
 ]
 
 # password reset django views (see above for password reset views)

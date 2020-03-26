@@ -338,7 +338,7 @@ FEATURES = {
     'ENABLE_OPENBADGES': False,
 
     # Enable LTI Provider feature.
-    'ENABLE_LTI_PROVIDER': False,
+    'ENABLE_LTI_PROVIDER': True,
 
     # Show the language selector in the header
     'SHOW_HEADER_LANGUAGE_SELECTOR': False,

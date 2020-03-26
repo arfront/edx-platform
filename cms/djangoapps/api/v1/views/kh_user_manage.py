@@ -2,10 +2,12 @@
 import logging
 import csv
 from django.utils.translation import ugettext_lazy as _
+
 from rest_framework import views, response, status, permissions
 from util.dintalkcompany import Dingtalkuserinfo
 from dingtalkuser.models import DingtalkUserconfig
 from arfrontconfig.models import WeihouaccountConfig
+from student.models import UserProfile
 
 log = logging.getLogger(__name__)
 
@@ -114,4 +116,19 @@ class WeiHouaccountView(views.APIView):
                 'msg': 'only localhost allowed'
             }
         return response.Response(res, status=status.HTTP_200_OK)
-        
+    
+    
+class GetfullnamefromusernameView(views.APIView):
+    
+    def get(self, request):
+        user_id = request.GET['id']
+        usermsg = UserProfile.objects.get(user_id=user_id)
+        data = {
+            'fullname': usermsg.name
+        }
+        res = {
+            'status': 10001,
+            'msg': 'get real name success',
+            'data': data
+        }
+        return response.Response(res, status=status.HTTP_200_OK)
