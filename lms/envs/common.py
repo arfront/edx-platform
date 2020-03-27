@@ -3265,7 +3265,8 @@ CREDENTIALS_GENERATION_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
 SITE_ID = 1
 
 # dir containing all themes
-COMPREHENSIVE_THEME_DIRS = [REPO_ROOT / "themes"]
+# COMPREHENSIVE_THEME_DIRS = [REPO_ROOT / "themes", REPO_ROOT / "edx-platform" / "themes"]
+COMPREHENSIVE_THEME_DIRS = [REPO_ROOT / "themes", "/openedx/edx-platform/themes"]
 
 # Theme directory locale paths
 COMPREHENSIVE_THEME_LOCALE_PATHS = []
