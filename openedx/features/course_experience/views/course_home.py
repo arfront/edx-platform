@@ -219,6 +219,7 @@ class CourseHomeFragmentView(EdxFragmentView):
             'uses_pattern_library': True,
             'upgrade_price': upgrade_price,
             'upgrade_url': upgrade_url,
+            'domon_type': request.domon_type,
         }
         html = render_to_string('course_experience/course-home-fragment.html', context)
         return Fragment(html)

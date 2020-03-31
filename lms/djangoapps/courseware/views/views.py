@@ -247,6 +247,7 @@ def courses(request):
             'course_discovery_meanings': course_discovery_meanings,
             'programs_list': programs_list,
             'journal_info': get_journals_context(request),  # TODO: Course Listing Plugin required
+            'domon_type': request.domon_type,
         }
     )
 
@@ -635,6 +636,7 @@ class CourseTabView(EdxFragmentView):
             'uses_bootstrap': uses_bootstrap,
             'uses_pattern_library': not uses_bootstrap,
             'disable_courseware_js': True,
+            'domon_type': request.domon_type,
         }
         # Avoid Multiple Mathjax loading on the 'user_profile'
         if 'profile_page_context' in kwargs:
@@ -896,6 +898,7 @@ def course_about(request, course_id):
             'reviews_fragment_view': reviews_fragment_view,
             'sidebar_html_enabled': sidebar_html_enabled,
             'allow_anonymous': allow_anonymous,
+            'domon_type': request.domon_type,
         }
 
         return render_to_response('courseware/course_about.html', context)

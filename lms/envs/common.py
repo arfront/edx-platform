@@ -1318,6 +1318,9 @@ MIDDLEWARE_CLASSES = [
     'edx_rest_framework_extensions.middleware.RequestMetricsMiddleware',
 
     'edx_rest_framework_extensions.auth.jwt.middleware.EnsureJWTAuthSettingsMiddleware',
+    
+    # setting demon show
+    'openedx.core.djangoapps.util.khmiddleware.DemonMiddleware',
 
     # This must be last
     'openedx.core.djangoapps.site_configuration.middleware.SessionCookieDomainOverrideMiddleware',
@@ -1392,7 +1395,10 @@ base_vendor_js = [
     'common/js/vendor/require.js',
     'js/RequireJS-namespace-undefine.js',
     'js/vendor/URI.min.js',
-    'common/js/vendor/backbone.js'
+    'common/js/vendor/backbone.js',
+    
+    # newer guide
+    'common/js/enjoyhint.js'
 ]
 
 main_vendor_js = base_vendor_js + [

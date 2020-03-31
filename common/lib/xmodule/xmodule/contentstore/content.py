@@ -81,7 +81,7 @@ class StaticContent(object):
         """
         path = path.replace('/', '_')
         AssetLocator.DEPRECATED_INVALID_CHARS = re.compile(r"[^\w.%-[\u4e00-\u9fa5]]", re.UNICODE)
-  
+
         course_key.ALLOWED_ID_CHARS = r'[\w\-~.:[\u4e00-\u9fa5]]'
         Locator.DEPRECATED_ALLOWED_ID_CHARS = r'[\w\-~.:%[\u4e00-\u9fa5]]'
         course_key.DEPRECATED_ALLOWED_ID_RE = re.compile(r'^[\w\-~.:%(\u4e00-\u9fa5)]+', re.UNICODE)

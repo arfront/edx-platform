@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from django.db import models
 from config_models.models import ConfigurationModel
 
+
 # Create your models here.
 class Youtubeaccountconfig(ConfigurationModel):
     
@@ -29,3 +30,14 @@ class WeihouaccountConfig(ConfigurationModel):
         app_label = "arfrontconfig"
         verbose_name = "Weihou account"
         verbose_name_plural = verbose_name
+        
+
+class NewerguideRecord(models.Model):
+    
+    id = models.AutoField(primary_key=True)
+    user_id = models.IntegerField(blank=False)
+    live_guide = models.BooleanField(default=False)
+    
+    class Meta:
+        db_table = 'newerguiderecord'
+        app_label = "arfrontconfig"
