@@ -1,9 +1,13 @@
+# -*- coding:utf-8 -*-
 import datetime
 import decimal
 import json
 import logging
+import time
+import random
 
 import pytz
+from datetime import datetime
 from config_models.decorators import require_config
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -22,6 +26,8 @@ from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods, require_POST
+from django.shortcuts import redirect
+from django.http.response import HttpResponse
 from ipware.ip import get_ip
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -42,6 +48,8 @@ from student.models import AlreadyEnrolledError, CourseEnrollment, CourseFullErr
 from util.bad_request_rate_limiter import BadRequestRateLimiter
 from util.date_utils import get_default_time_display
 from util.json_request import JsonResponse
+from processors.alipay_payment import Alipay, alipay_config_get
+from alipay.aop.api.util.SignatureUtils import verify_with_rsa
 
 from .decorators import enforce_shopping_cart_enabled
 from .exceptions import (
@@ -74,6 +82,7 @@ from .processors import (
     process_postpay_callback,
     render_purchase_form_html
 )
+from arfrontconfig.models import AlipayinfoConfig
 
 log = logging.getLogger("shoppingcart")
 AUDIT_LOG = logging.getLogger("audit")
@@ -1036,3 +1045,251 @@ def csv_report(request):
 
     else:
         return HttpResponseBadRequest("HTTP Method Not Supported")
+
+@login_required()
+@csrf_exempt
+def paymentview(request):
+    show_paying_tip = False
+    show_closepaying_tip = False
+    if request.method == 'POST':
+        if Order.dose_user_having_paying(request.user):
+            error_msg = {
+                'error_msg': _('You have an unprocessed order, please continue to place the order after processing, Please wait a moment, will jump to the unprocessed order page'),
+                'is_waiting': True,
+                'target_url': '/shoppingcart/payment/'
+            }
+            return render_to_response('shoppingcart/shopping_cart_payment_error.html', error_msg)
+        
+        cart = Order.get_cart_for_user(request.user)
+        if cart.out_trade_no == '':
+            out_trade_no = str(int(time.time())) + str(random.randint(10000, 100000))
+            cart.save_out_trade_no(out_trade_no)
+        else:
+            out_trade_no = cart.out_trade_no
+        
+        if cart.order_create_time == '':
+            order_create_time = datetime.now()
+            cart.order_create_time = order_create_time
+            cart.save()
+        else:
+            order_create_time = cart.order_create_time
+        
+        amount = float(request.POST.get('amount', ''))
+        currency = request.POST.get('currency', '')
+        
+        # 正式的时候需要开启
+        cart.start_purchase()
+        context_dict = {
+            'currency_symbol': u'￥',
+            'amount': amount,
+            'currency': currency,
+            'out_trade_no': out_trade_no,
+            'order_create_time': order_create_time,
+            'show_paying_tip': show_paying_tip,
+            'show_closepaying_tip': show_closepaying_tip,
+            'params': ''
+        }
+        return render_to_response('shoppingcart/shopping_cart_payment.html', context_dict)
+    
+    elif request.method == 'GET':
+        if not Order.dose_user_having_paying(request.user):
+            error_msg = {
+                'error_msg': _('Not exist paying order, please add some courses in shoppingcart, and pay it')
+            }
+            return render_to_response('shoppingcart/shopping_cart_payment_error.html', error_msg)
+        
+        paying = Order.get_paying_for_user(request.user)
+        if paying.pay_type == 'alipay':
+            # 判断该比订单是否在支付宝端支付完成
+            alipay = alipay_config_get()
+            if not alipay:
+                error_msg = {
+                    'error_msg': _('Not exist alipay config')
+                }
+                return render_to_response('shoppingcart/shopping_cart_payment_error.html', error_msg)
+            result = alipay.find_pay_result(paying.out_trade_no)
+            if result in ['TRADE_SUCCESS', 'TRADE_FINISHED']:
+                paying.purchase()
+                url = settings.LMS_ROOT_URL + '/shoppingcart/alipay_callback/?out_trade_no=' + str(paying.out_trade_no) + '&total_amount=' + str(paying.total_cost)
+                return redirect(url)
+            elif result == 'WAIT_BUYER_PAY':
+                show_paying_tip = True
+            elif result == 'TRADE_CLOSED':
+                paying.retire()
+                show_closepaying_tip = True
+            
+        amount = paying.total_cost
+        out_trade_no = paying.out_trade_no
+        order_create_time = paying.order_create_time
+        currency = paying.currency
+        
+        context_dict = {
+            'currency_symbol': u'￥',
+            'amount': amount,
+            'currency': currency,
+            'out_trade_no': out_trade_no,
+            'order_create_time': order_create_time,
+            'show_paying_tip': show_paying_tip,
+            'show_closepaying_tip': show_closepaying_tip
+        }
+        return render_to_response('shoppingcart/shopping_cart_payment.html', context_dict)
+
+
+@login_required()
+@csrf_exempt
+@require_POST
+def orderpaydeal(request):
+    pay_type = request.POST.get('pay_type', '')
+    if pay_type not in settings.ALLOW_PAY_METHOD:
+        raise Exception('error pay method: ' + pay_type)
+    
+    paying = Order.get_paying_for_user(request.user)
+    out_trade_no = request.POST.get('out_trade_no', '')
+    if out_trade_no != paying.out_trade_no:
+        raise Exception('error out_trade_no: ' + out_trade_no)
+    
+    if pay_type == 'alipay':
+        paying = Order.get_paying_for_user(request.user)
+        paying.pay_type = 'alipay'
+        paying.save()
+        amount = "{0:0.2f}".format(paying.total_cost)
+        out_trade_no = paying.out_trade_no
+        subject = str(settings.PLATFORM_NAME) + '课程购买'
+        body = subject
+        alipay = alipay_config_get()
+        if not alipay:
+            error_msg = {
+                'error_msg': _('Not exist alipay config')
+            }
+            return render_to_response('shoppingcart/shopping_cart_payment_error.html', error_msg)
+        alipay_url = alipay.get_alipay_url(out_trade_no, subject, amount, body, product_code='FAST_INSTANT_TRADE_PAY')
+        return redirect(alipay_url)
+    else:
+        pass
+
+
+def alipay_callback(request):
+    context_dict = {
+        'out_trade_no': request.GET.get('out_trade_no', ''),
+        'total_amount': request.GET.get('total_amount', ''),
+    }
+    return render_to_response('shoppingcart/shopping_cart_waiting_result.html', context_dict)
+
+
+@require_POST
+def alipay_notify_url_callback(request):
+    pay_success = False
+    params = request.POST.dict()
+    notify_type = params['notify_type']  # 通知类型
+    trade_status = params['trade_status']  # 支付状态
+    out_trade_no = params['out_trade_no']  # 订单号
+    
+    sign, sign_type = params.pop('sign'), params.pop('sign_type')
+    url_params = sorted(params.items(), key=lambda e: e[0], reverse=False)
+    message = "&".join(u"{}={}".format(k, v) for k, v in url_params).encode()
+
+    config = AlipayinfoConfig.current()
+    if config.enabled:
+        appid = config.appid
+        app_private_key = config.app_private_key
+        alipay_public_key = config.alipay_public_key
+    else:
+        error_msg = {
+            'error_msg': _('Not exist alipay config')
+        }
+        return render_to_response('shoppingcart/shopping_cart_payment_error.html', error_msg)
+
+    try:
+        if verify_with_rsa(alipay_public_key.encode('utf-8').decode('utf-8'), message, sign):
+            if out_trade_no == '':
+                raise Exception('error callback [out_trade_no] info from alipay')
+            
+            order = Order.objects.filter(out_trade_no=out_trade_no).get()
+            
+            log.info('database order cost' + str(order.total_cost))
+            log.info('alipay callback cost' + str(params['total_amount']))
+            if order.total_cost != params['total_amount']:
+                raise Exception('error total amount')
+            
+            if appid != params['app_id']:
+                raise Exception('error app_id')
+            
+            # if seller_id != params['seller_id']:
+            #     raise Exception('error seller_id')
+
+            if notify_type == 'trade_status_sync':
+                pay_success = False
+            if trade_status == 'TRADE_SUCCESS' or trade_status == 'TRADE_FINISHED':
+                order.purchase()
+                pay_success = True
+                
+            if pay_success:
+                # 如果支付成功一定是success这个单词，其他的alipay不认
+                return HttpResponse('success')
+            return HttpResponse('failure')
+        else:
+            return HttpResponse('failure')
+
+    except Exception as e:
+        log.error(e)
+        return HttpResponse('failure')
+        
+        
+@login_required()
+@require_POST
+def order_status_report(request):
+    out_trade_no = request.POST.get('out_trade_no', '')
+    order = Order.objects.filter(out_trade_no=out_trade_no).get()
+    
+    if order.pay_type == 'alipay':
+        # 判断该笔订单是否在支付宝端支付完成
+        alipay = alipay_config_get()
+        if not alipay:
+            error_msg = {
+                'error_msg': _('Not exist alipay config')
+            }
+            return render_to_response('shoppingcart/shopping_cart_payment_error.html', error_msg)
+        result = alipay.find_pay_result(order.out_trade_no)
+        print(result)
+        if result in ['TRADE_SUCCESS', 'TRADE_FINISHED'] and order.status == 'paying':
+            order.purchase()
+        elif result == 'WAIT_BUYER_PAY':
+            pass
+        elif result == 'TRADE_CLOSED':
+            if order.status == 'paying':
+                order.retire()
+    if order.status == 'purchased':
+        return JsonResponse({'result': 'success', 'msg': 'get money'})
+    elif order.status in ['defunct-paying', 'refunded']:
+        return JsonResponse({'result': 'fail', 'msg': 'Paying have been canceled'})
+    elif order.status == 'paying':
+        return JsonResponse({'result': 'waiting', 'msg': 'Order information has not changed'})
+    else:
+        return JsonResponse({'result': 'unknow status', 'msg': ''})
+
+
+@login_required()
+@require_POST
+def cancel_order(request):
+    order_cancle_result = False
+    order_ailpay_cancle_result = False
+    out_trade_no = request.POST.get('out_trade_no', '')
+    alipay = alipay_config_get()
+    order_status = alipay.find_pay_result(out_trade_no)
+    
+    if order_status:
+        if order_status in ['TRADE_CLOSED', 'TRADE_SUCCESS', 'TRADE_FINISHED']:
+            return JsonResponse({'result': 'fail', 'msg': 'order have been closed', 'data': ''})
+        
+        order_ailpay_cancle_result = alipay.cancle_order(out_trade_no)
+    
+    order = Order.objects.filter(out_trade_no=out_trade_no).get()
+    if order.status in ['paying', 'cart']:
+        order.retire()
+        order_cancle_result = True
+    
+    if order_cancle_result or order_ailpay_cancle_result:
+        return JsonResponse({'result': 'success', 'msg': 'order is close', 'data': ''})
+    
+    return JsonResponse({'result': 'fail', 'msg': 'order can`t be canceled'})
+

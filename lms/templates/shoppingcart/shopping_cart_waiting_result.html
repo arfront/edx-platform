@@ -1,0 +1,55 @@
+<%inherit file="../main.html" />
+<%!
+from django.utils.translation import ugettext as _
+from django.urls import reverse
+%>
+<%block name="pagetitle">${_("payment waiting")}</%block>
+
+<section class="container">
+    <p><h1>${_('Waiting to check the payment result, will jump soon, please wait ...')}</h1></p>
+    <form action="/shoppingcart/postpay_callback/" method="post">
+        <input type="hidden" name="out_trade_no" value="${out_trade_no}" />
+        <input type="hidden" name="total_amount" value="${total_amount}" />
+        <input type="submit" value="confirm" id="postcallback" style="display: none;"/>
+    </form>
+</section>
+
+<script>
+    $(function () {
+        var times = 0;
+        var isSucccess = false;
+        var err_sign = false;
+        var host= window.location.host;
+        var protocolStr = document.location.protocol;
+
+        while (times <= 5 && isSucccess == false) {
+            times += 1;
+            $.ajax({
+                url: protocolStr+ '//' + host + '/shoppingcart/order_status_report/',
+                type: 'POST',
+                data: {
+                    'out_trade_no': '${out_trade_no}'
+                },
+                async: false,
+                success: function (info) {
+                    if (info.result == 'success') {
+                        isSucccess = true;
+
+                    } else if(info.result == 'fail') {
+                        err_sign = true;
+                    }
+                }
+            });
+            if (err_sign == true) {
+                break;
+            }
+        }
+
+        if (err_sign == false && isSucccess == true) {
+            $('#postcallback').trigger("click");
+        } else {
+            window.location.href = protocolStr+ '//' + host + "/shoppingcart/payment/"
+        }
+    });
+
+</script>

@@ -1,0 +1,21 @@
+<%inherit file="../main.html" />
+<%!
+from django.utils.translation import ugettext as _
+from django.urls import reverse
+%>
+<%block name="pagetitle">${_("Payment Error")}</%block>
+
+<section class="container">
+    <p><h1>${error_msg}</h1></p>
+</section>
+
+% if is_waiting:
+<script>
+    $(function () {
+        setTimeout(function(){
+            window.location.href = '${target_url}'
+        },3000)
+    });
+
+</script>
+% endif

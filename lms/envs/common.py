@@ -47,6 +47,8 @@ from xmodule.modulestore.modulestore_settings import update_module_store_setting
 from xmodule.modulestore.edit_info import EditInfoMixin
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 
+DEFAULT_CHARSET = 'utf-8'
+
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
 PLATFORM_NAME = _('K&H Academy')
@@ -203,13 +205,13 @@ FEATURES = {
     'RESTRICT_AUTOMATIC_AUTH': True,
 
     # Toggle the availability of the shopping cart page
-    'ENABLE_SHOPPING_CART': False,
+    'ENABLE_SHOPPING_CART': True,
 
     # Toggle storing detailed billing information
-    'STORE_BILLING_INFO': False,
+    'STORE_BILLING_INFO': True,
 
     # Enable flow for payments for course registration (DIFFERENT from verified student flow)
-    'ENABLE_PAID_COURSE_REGISTRATION': False,
+    'ENABLE_PAID_COURSE_REGISTRATION': True,
 
     # Enable the display of cosmetic course price display (set in course advanced settings)
     'ENABLE_COSMETIC_DISPLAY_PRICE': False,
@@ -699,7 +701,7 @@ WIKI_ENABLED = False
 
 COURSE_MODE_DEFAULTS = {
     'bulk_sku': None,
-    'currency': 'usd',
+    'currency': 'cny',
     'description': None,
     'expiration_datetime': None,
     'min_price': 0,
@@ -1144,14 +1146,14 @@ ZENDESK_CUSTOM_FIELDS = {}
 EMBARGO_SITE_REDIRECT_URL = None
 
 ##### shoppingcart Payment #####
-PAYMENT_SUPPORT_EMAIL = 'payment@example.com'
+PAYMENT_SUPPORT_EMAIL = 'admin@arfront.com'
 
 ##### Using cybersource by default #####
 
-CC_PROCESSOR_NAME = 'CyberSource2'
+CC_PROCESSOR_NAME = 'kh_payment'
 CC_PROCESSOR = {
-    'CyberSource2': {
-        "PURCHASE_ENDPOINT": '',
+    'kh_payment': {
+        "PURCHASE_ENDPOINT": '/shoppingcart/payment/',
         "SECRET_KEY": '',
         "ACCESS_KEY": '',
         "PROFILE_ID": '',
@@ -1159,7 +1161,9 @@ CC_PROCESSOR = {
 }
 
 # Setting for PAID_COURSE_REGISTRATION, DOES NOT AFFECT VERIFIED STUDENTS
-PAID_COURSE_REGISTRATION_CURRENCY = ['usd', '$']
+PAID_COURSE_REGISTRATION_CURRENCY = ['cny', '￥', 'usd', '$']
+
+ALLOW_PAY_METHOD = ['alipay', 'wechatpay']
 
 # Members of this group are allowed to generate payment reports
 PAYMENT_REPORT_GENERATOR_GROUP = 'shoppingcart_report_access'

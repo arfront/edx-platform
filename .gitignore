@@ -142,3 +142,5 @@ dist
 .vscode
 venv/
 .gitignore
+
+common/lib/alipay-sdk-python-all/

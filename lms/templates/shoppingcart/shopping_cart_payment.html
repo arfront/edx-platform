@@ -1,0 +1,101 @@
+<%inherit file="shopping_cart_flow.html" />
+<%block name="payment_highlight">class="active"</%block>
+
+<%!
+from django.urls import reverse
+from edxmako.shortcuts import marketing_link
+from django.utils.translation import ugettext as _
+from django.utils.translation import ungettext
+from openedx.core.lib.courses import course_image_url
+%>
+
+<section class="wrapper confirm-enrollment shopping-cart cart-view">
+  <%block name="custom_content">
+
+  <div class="container">
+
+    <article class="wrapper confirm-enrollment shopping-cart cart-view" aria-label="${_('Shopping Cart')}">
+        <div class="order-title">
+            <div class="left trade-title">
+                <span class="order-number">${_('Order Number')}: ${out_trade_no}</span>
+            </div>
+        </div>
+        <div class="pay-method">
+            <h2 class="pay-method-title">${_('Payment method')}:</h2>
+            <ul class="payment-method">
+              <li class="payment-card alipay-card card-active">
+                  <span class="card-content">alipay</span>
+              </li>
+              <li class="payment-card wechat-card">
+                  <span class="card-content">wechatpay</span>
+              </li>
+            </ul>
+        </div>
+
+        <div class="pay-bottom">
+            <div class="left-cancle-button">
+                <button type="button" onclick="cancleorder(${out_trade_no})">${_('cancel order')}</button>
+            </div>
+            <div class="right-money">
+            <p>
+                ${_('You need to pay: <span style="font-size: 18px; color: #5594e6;"><strong>{currency_symbol} {price} {currency_abbr}</strong></span>').format(currency_symbol=currency_symbol, price="{0:0.2f}".format(amount), currency_abbr=currency.upper())}
+            </p>
+            <form action="/shoppingcart/orderpaydeal/" method="post">
+                <input type="hidden" name="currency" value="${currency}"/>
+                <input type="hidden" name="amount" value="${amount}" />
+                <input type="hidden" name="out_trade_no" value="${out_trade_no}" />
+                <input type="hidden" name="pay_type" value="alipay" />
+                <button type="submit" class="payment-submit" id="payment-submit">${_('confirm')}</button>
+            </form>
+            </div>
+
+        </div>
+     </article>
+  </div>
+</section>
+
+% if show_paying_tip:
+<div class="black-background-payment" style="display: block;"></div>
+<div class="dingtalkautologinbox-payment" style="display: block;">
+    <div class="dingtalk-box-content">
+    ${_("Please pay the order in alipay and then click `ok` to next step")}
+        <div class="dingtalk-autologin-button-box">
+            <a href="#" onclick="cancleorder(${out_trade_no})" class="dingtalk-autologin-cancle dingtalk-autologin-button" style="color: white">${_("cancle")}</a>
+            <a href="/shoppingcart/alipay_callback/?out_trade_no=${out_trade_no}&total_amount=${amount}" class="dingtalk-autologin-login dingtalk-autologin-button" style="color: white">${_("ok")}</a>
+        </div>
+    </div>
+</div>
+% endif
+
+<form id='refresh_tracker'>
+   <input id="reloadValue" type="hidden" name="reloadValue" value="" />
+</form>
+</%block>
+<script type="text/javascript">
+    $(function () {
+        $('.payment-method li').click(function () {
+            $(this).siblings('li').removeClass('card-active');
+            $(this).addClass('card-active');
+            $("input[name='pay_type']").val($(this).children('span').html());
+        })
+    });
+
+    function cancleorder(out_trade_no) {
+        $.ajax({
+            url: '/shoppingcart/cancel_order/',
+            type: 'post',
+            data: {
+                'out_trade_no': out_trade_no
+            },
+            success: function (info) {
+                if (info.result == 'success') {
+                    alert('订单取消成功, 即将跳转到购物车页面')
+                    window.location.href = '/shoppingcart'
+                } else {
+
+                }
+            }
+        })
+    }
+
+</script>

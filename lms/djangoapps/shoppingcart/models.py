@@ -82,6 +82,11 @@ ORDER_STATUSES = (
     ('defunct-paying', 'defunct-paying'),
 )
 
+PAY_METHOD = (
+    ('alipay', 'alipay'),
+    ('wechatpay', 'wechatpay'),
+)
+
 # maps order statuses to their defunct states
 ORDER_STATUS_MAP = {
     'cart': 'defunct-cart',
@@ -115,7 +120,7 @@ class Order(models.Model):
         app_label = "shoppingcart"
 
     user = models.ForeignKey(User, db_index=True, on_delete=models.CASCADE)
-    currency = models.CharField(default="usd", max_length=8)  # lower case ISO currency codes
+    currency = models.CharField(default="cny", max_length=8)  # lower case ISO currency codes
     status = models.CharField(max_length=32, default='cart', choices=ORDER_STATUSES)
     purchase_time = models.DateTimeField(null=True, blank=True)
     refunded_time = models.DateTimeField(null=True, blank=True)
@@ -133,6 +138,10 @@ class Order(models.Model):
     bill_to_cardtype = models.CharField(max_length=32, blank=True)
     # a JSON dump of the CC processor response, for completeness
     processor_reply_dump = models.TextField(blank=True)
+    # out_trade_no is unique
+    out_trade_no = models.CharField(unique=True, blank=True, max_length=128)
+    order_create_time = models.DateTimeField(null=True, blank=True)
+    pay_type = models.CharField(max_length=32, default='alipay', choices=PAY_METHOD)
 
     # bulk purchase registration code workflow billing details
     company_name = models.CharField(max_length=255, null=True, blank=True)
@@ -143,6 +152,15 @@ class Order(models.Model):
     customer_reference_number = models.CharField(max_length=63, null=True, blank=True)
     order_type = models.CharField(max_length=32, default='personal', choices=OrderTypes.ORDER_TYPES)
 
+    @classmethod
+    def dose_user_having_paying(cls, user):
+        return cls.objects.filter(user=user, status='paying').exists()
+    
+    @classmethod
+    def get_paying_for_user(cls, user):
+        pay_order = cls.objects.filter(user=user, status='paying').order_by('-id')[:1].get()
+        return pay_order
+        
     @classmethod
     def get_cart_for_user(cls, user):
         """
@@ -234,6 +252,11 @@ class Order(models.Model):
         Clear out all the items in the cart
         """
         self.orderitem_set.all().delete()
+        
+    def save_out_trade_no(self, out_trade_no):
+        if self.out_trade_no == '' or self.out_trade_no == None:
+            self.out_trade_no = out_trade_no
+            self.save()
 
     @transaction.atomic
     def start_purchase(self):

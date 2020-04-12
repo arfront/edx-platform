@@ -359,6 +359,8 @@ zendesk==1.1.1
 zope.interface==4.6.0
 pypinyin==0.36.0
 rsa==4.0
+alipay-sdk-python==3.3.398
+
 # all xblock in there
 # pdf
 git+https://github.com/MarCnu/pdfXBlock.git@master
