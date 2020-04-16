@@ -24701,3 +24701,15 @@ msgstr "该email已经存在，无法继续录入该用户"
 
 msgid "Import User from csv file"
 msgstr "从csv文件导入用户"
+
+msgid "Not exist alipay config"
+msgstr "支付宝配置信息不存在"
+
+msgid "Not exist paying order, please add some courses in shoppingcart, and pay it"
+msgstr "不存在支付中的订单，请先在购物车中添加一些课程再支付"
+
+msgid "You have an unprocessed order, please continue to place the order after processing, Please wait a moment, will jump to the unprocessed order page"
+msgstr "您有一个未处理的订单，请现行处理完成后再下单，请稍等，将跳转到未处理的订单页面"
+
+msgid "Waiting to check the payment result, will jump soon, please wait ..."
+msgstr "等待查询支付结果，即将跳转，请稍后......"

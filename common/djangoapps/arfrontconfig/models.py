@@ -41,3 +41,16 @@ class NewerguideRecord(models.Model):
     class Meta:
         db_table = 'newerguiderecord'
         app_label = "arfrontconfig"
+
+
+class AlipayinfoConfig(ConfigurationModel):
+    
+    appid = models.TextField(blank=True, verbose_name='appid')
+    app_private_key = models.TextField(blank=True, verbose_name='app_private_key')
+    alipay_public_key = models.TextField(blank=True, verbose_name='alipay_public_key')
+    
+    class Meta:
+        db_table = "alipayinfoconfig"
+        app_label = "arfrontconfig"
+        verbose_name = "Alipay info"
+        verbose_name_plural = verbose_name

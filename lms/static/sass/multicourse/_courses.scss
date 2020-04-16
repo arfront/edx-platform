@@ -599,3 +599,160 @@ $facet-background-color: #007db8;
     padding-top: ($baseline*3);
   }
 }
+
+.order-title {
+    color: #5e5e5e;
+    line-height: 88px;
+    min-height: 88px;
+    /*border-bottom: 1px solid #b7bbbf;*/
+}
+
+.order-number {
+    font-size: 18px;
+    color: #07111b;
+}
+
+.pay-method {
+    padding: 30px 12px 48px;
+    /*border-top: 1px solid #d9dde1;*/
+    border-bottom: 1px solid #d9dde1;
+}
+
+.pay-method-title {
+    height: 30px;
+    line-height: 30px;
+    font-size: 26px;
+    color: #07111b;
+    font-weight: 400;
+    font: 14px/2em "PingFang SC","微软雅黑","Microsoft YaHei",Helvetica,"Helvetica Neue",Tahoma,Arial,sans-serif;
+}
+.payment-method {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.payment-method:after {
+    content: '\0020';
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+}
+
+.payment-card {
+    float: left;
+    margin-right: 18px;
+    position: relative;
+    border-radius: 6px;
+    overflow: hidden;
+    width: 192px;
+    height: 86px;
+    background-color: #f3f5f7;
+    border: 2px solid #f3f5f7;
+    cursor: pointer;
+    background-image: url('/static/images/pay_s.png');
+}
+
+.payment-card:hover {
+    border-color: #5594e6!important;
+}
+
+.card-active {
+    border-color: #5594e6!important;
+}
+
+.alipay-card {
+    background-position: 33px -304px;
+    background-repeat: no-repeat;
+}
+
+.wechat-card {
+    background-position: 30px -423px;
+    background-repeat: no-repeat;
+}
+
+
+.trade-title {
+    line-height: 16px;
+    padding-top: 36px;
+    padding-bottom: 24px;
+    float: left!important;
+}
+
+.payment-way-container {
+    list-style: none;
+    display: block;
+    list-style-type: disc;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    padding-inline-start: 40px;
+}
+
+.pay-bottom {
+    line-height: 40px;
+    height: 80px;
+    margin-top: 20px;
+}
+
+.right-money {
+    float: right;
+}
+
+.left-cancle-button {
+    float: left;
+}
+
+
+
+#payment-submit {
+    float:right;
+    background-color: #5594e6;
+    width: 160px;
+    height: 50px;
+    line-height: 30px;
+}
+
+#payment-submit:hover {
+    background: #0075b4;
+}
+
+.card-content {
+    display: none;
+}
+
+.black-background-payment {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    overflow: hidden;
+    outline: 0;
+    -webkit-overflow-scrolling: touch;
+    background-color: rgb(0, 0, 0);
+    filter: alpha(opacity=60);
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 998;
+    /*display: none;*/
+}
+
+.dingtalkautologinbox-payment {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 240px;
+    height: auto;
+    z-index: 999;
+    background-color: white;
+    /*text-align: center;*/
+    border-style: solid;
+    border-color: #767676;
+    border-radius: 5px 5px 5px 5px;
+    line-height: 120%;
+    /*display: none;*/
+}
+

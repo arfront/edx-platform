@@ -125,15 +125,15 @@ WEBPACK_CONFIG_PATH = 'webpack.dev.config.js'
 FEATURES['AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'] = True
 FEATURES['ENABLE_PAYMENT_FAKE'] = True
 
-CC_PROCESSOR_NAME = 'CyberSource2'
-CC_PROCESSOR = {
-    'CyberSource2': {
-        "PURCHASE_ENDPOINT": '/shoppingcart/payment_fake/',
-        "SECRET_KEY": 'abcd123',
-        "ACCESS_KEY": 'abcd123',
-        "PROFILE_ID": 'edx',
-    }
-}
+# CC_PROCESSOR_NAME = 'CyberSource2'
+# CC_PROCESSOR = {
+#     'CyberSource2': {
+#         "PURCHASE_ENDPOINT": '/shoppingcart/payment_fake/',
+#         "SECRET_KEY": 'abcd123',
+#         "ACCESS_KEY": 'abcd123',
+#         "PROFILE_ID": 'edx',
+#     }
+# }
 
 ########################### External REST APIs #################################
 FEATURES['ENABLE_OAUTH2_PROVIDER'] = True

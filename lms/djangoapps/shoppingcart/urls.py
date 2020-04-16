@@ -27,6 +27,12 @@ urlpatterns = [
     url(r'^reset_code_redemption/$', views.reset_code_redemption, name='shoppingcart.views.reset_code_redemption'),
     url(r'^billing_details/$', views.billing_details, name='billing_details'),
     url(r'^verify_cart/$', views.verify_cart, name='shoppingcart.views.verify_cart'),
+    url(r'^payment/$', views.paymentview, name='shoppingcart.views.payment'),
+    url(r'^orderpaydeal/$', views.orderpaydeal, name='shoppingcart.views.orderpaydeal'),
+    url(r'^alipay_callback/$', views.alipay_callback, name='shopping.views.alipay_callback'),
+    url(r'^alipay_notify_url_callback/$', views.alipay_notify_url_callback, name='shopping.views.alipay_notify_url_callback'),
+    url(r'^order_status_report/$', views.order_status_report, name='shopping.views.order_status_report'),
+    url(r'^cancel_order/$', views.cancel_order, name='shopping.views.cancel_order'),
 ]
 
 if settings.FEATURES.get('ENABLE_PAYMENT_FAKE'):
