@@ -81,6 +81,7 @@ from pipeline_mako import render_require_js_path_overrides
   <script type="text/javascript" src="${static.url(ie11_fix_path)}"></script>
 
   <link rel="icon" type="image/x-icon" href="${static.url(static.get_value('favicon_path', settings.FAVICON_PATH))}" />
+  <link href="${static.url('css/enjoyhint.css')}" rel="stylesheet">
 
   <%static:css group='style-vendor'/>
   % if '/' in self.attr.main_css:

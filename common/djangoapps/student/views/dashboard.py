@@ -936,6 +936,7 @@ def student_dashboard(request):
         'empty_dashboard_message': empty_dashboard_message,
         'recovery_email_message': recovery_email_message,
         'recovery_email_activation_message': recovery_email_activation_message,
+        'domon_type': request.domon_type,
     }
 
     if ecommerce_service.is_enabled(request.user):

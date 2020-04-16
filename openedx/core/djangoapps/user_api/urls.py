@@ -18,6 +18,7 @@ from .accounts.views import (
 from .preferences.views import PreferencesDetailView, PreferencesView
 from .verification_api.views import IDVerificationStatusView
 from .validation.views import RegistrationValidationView
+from .views import RecordNewGuideView
 
 ME = AccountViewSet.as_view({
     'get': 'get',
@@ -164,5 +165,9 @@ urlpatterns = [
         r'^v1/preferences/{}/(?P<preference_key>[a-zA-Z0-9_]+)$'.format(settings.USERNAME_PATTERN),
         PreferencesDetailView.as_view(),
         name='preferences_detail_api'
+    ),
+    url(
+        r'^v1/recordnewguide/$',
+        RecordNewGuideView.as_view(),
     ),
 ]

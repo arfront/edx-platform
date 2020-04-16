@@ -264,3 +264,41 @@ ${HTML(fragment.foot_html())}
       % endif
     </nav>
 % endif
+
+% if domon_type == 'live':
+<script type="text/javascript">
+    $(document).ready(function(){
+        var enjoyhint_instance = new EnjoyHint({});
+        var enjoyhint_script_steps = [];
+        //直播课演示
+        if ($('p.lti-link button').length > 0 && $('.course-name').html() == '直播课演示') {
+            enjoyhint_script_steps = [
+              {
+                selector:'p.lti-link button',//jquery selector
+                event:'click',
+                description:'点击进入直播',
+                onBeforeStart:function(){
+                    enddomon('live')
+                }
+              }
+            ];
+        }
+        enjoyhint_instance.set(enjoyhint_script_steps);
+        enjoyhint_instance.run();
+    });
+
+    function enddomon(type) {
+        var host=window.location.host;
+        var protocolStr = document.location.protocol;
+
+        $.ajax({
+            url: protocolStr+ '//' + host + '/api/user/v1/recordnewguide/?domon_type=' + type,
+            type: 'get',
+            success: function (info) {
+                console.log(info)
+            }
+
+        })
+    }
+</script>
+% endif

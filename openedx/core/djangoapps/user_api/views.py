@@ -36,6 +36,7 @@ from openedx.core.djangoapps.user_authn.views.register import create_account_wit
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
 from student.helpers import AccountValidationError
 from util.json_request import JsonResponse
+from arfrontconfig.models import NewerguideRecord
 
 
 class LoginSessionView(APIView):
@@ -326,3 +327,22 @@ class CountryTimeZoneListView(generics.ListAPIView):
     def get_queryset(self):
         country_code = self.request.GET.get('country_code', None)
         return get_country_time_zones(country_code)
+
+
+class RecordNewGuideView(APIView):
+    permission_classes = (IsAuthenticated,)
+    
+    def get(self, request):
+        user_id = request.user.id
+        domon_type = request.GET.get('domon_type', '')
+        if domon_type == '':
+            return JsonResponse({}, status=status.HTTP_400_BAD_REQUEST)
+        if user_id:
+            res = NewerguideRecord.objects.filter(user_id=user_id)
+            if domon_type == 'live':
+                if res:
+                    res.update(live_guide=True)
+                else:
+                    NewerguideRecord.objects.create(user_id=user_id, live_guide=True)
+        
+        return JsonResponse({'result': 'success'}, status=status.HTTP_200_OK)
