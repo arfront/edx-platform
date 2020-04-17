@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('arfrontconfig', '0004_weihouaccountconfig'),
+        ('arfrontconfig', '0005_newerguiderecord'),
     ]
 
     operations = [
