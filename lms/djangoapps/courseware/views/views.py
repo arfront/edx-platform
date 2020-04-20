@@ -866,7 +866,8 @@ def course_about(request, course_id):
 
         # Embed the course reviews tool
         reviews_fragment_view = CourseReviewsModuleFragmentView().render_to_fragment(request, course=course)
-
+        
+        
         context = {
             'course': course,
             'course_details': course_details,
@@ -899,6 +900,7 @@ def course_about(request, course_id):
             'sidebar_html_enabled': sidebar_html_enabled,
             'allow_anonymous': allow_anonymous,
             'domon_type': request.domon_type,
+            'show_mycourses_tabs': True,
         }
 
         return render_to_response('courseware/course_about.html', context)

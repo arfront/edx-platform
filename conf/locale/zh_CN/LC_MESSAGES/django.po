@@ -15320,6 +15320,9 @@ msgstr "查看课程"
 msgid "This course is in your <a href=\"{cart_link}\">cart</a>."
 msgstr "这个课程已经进入您的 <a href=\"{cart_link}\">购物车</a>。"
 
+msgid "This course is in your cart."
+msgstr "这个课程已经进入您的购物车"
+
 #: lms/templates/courseware/course_about.html
 msgid "Course is full"
 msgstr "该课程已满"
@@ -24713,3 +24716,13 @@ msgstr "您有一个未处理的订单，请现行处理完成后再下单，请
 
 msgid "Waiting to check the payment result, will jump soon, please wait ..."
 msgstr "等待查询支付结果，即将跳转，请稍后......"
+
+#: lms/templates/courseware/course_about.html
+msgid "Add {course_name} to Cart {start_span}({price}){end_span}"
+msgstr "添加{course_name}到购物车, 价格{start_span}({price}){end_span}"
+
+msgid "Join learning"
+msgstr "加入学习"
+
+msgid "My courses"
+msgstr "我的课程"

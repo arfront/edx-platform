@@ -294,7 +294,7 @@ def use_code(request):
     coupons = Coupon.objects.filter(
         Q(code=code),
         Q(is_active=True),
-        Q(expiration_date__gt=datetime.datetime.now(pytz.UTC)) |
+        Q(expiration_date__gt=datetime.now(pytz.UTC)) |
         Q(expiration_date__isnull=True)
     )
     if not coupons:

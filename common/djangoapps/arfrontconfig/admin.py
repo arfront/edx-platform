@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.contrib import admin
-from .models import Youtubeaccountconfig, WeihouaccountConfig, AlipayinfoConfig
+from .models import Youtubeaccountconfig, WeihouaccountConfig, AlipayinfoConfig, Lmsbannerlist
 
 # Register your models here.
 class YoutubeaccountconfigAdmin(admin.ModelAdmin):
@@ -19,3 +19,9 @@ class AlipayinfoConfigAdmin(admin.ModelAdmin):
     list_display = ['appid', 'enabled']
     
 admin.site.register(AlipayinfoConfig, AlipayinfoConfigAdmin)
+
+
+class LmsbannerlistAdmin(admin.ModelAdmin):
+    list_display = ['id', 'order_id', 'banner']
+
+admin.site.register(Lmsbannerlist, LmsbannerlistAdmin)

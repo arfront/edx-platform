@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import os
+import uuid
 from django.db import models
 from config_models.models import ConfigurationModel
 
@@ -54,3 +56,29 @@ class AlipayinfoConfig(ConfigurationModel):
         app_label = "arfrontconfig"
         verbose_name = "Alipay info"
         verbose_name_plural = verbose_name
+
+
+
+def user_directory_path(instance, filename):
+    ext = filename.split('.').pop()
+    filename = '{0}.{1}'.format(uuid.uuid4(), ext)
+    return os.path.join(filename)
+
+
+class Lmsbannerlist(models.Model):
+    
+    id = models.AutoField(primary_key=True)
+    banner = models.ImageField(verbose_name='banner path', upload_to=user_directory_path, default='')
+    order_id = models.IntegerField(default=1, verbose_name='Sort')
+    
+    class Meta:
+        db_table = "lmsbannerlist"
+        app_label = "arfrontconfig"
+        verbose_name = "Lms banner"
+        verbose_name_plural = verbose_name
+        
+    def banner_url(self):
+        if self.banner and hasattr(self.banner, 'url'):
+            return self.banner.url
+        else:
+            return '/static/images/lms_banner.jpg'

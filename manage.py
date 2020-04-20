@@ -28,6 +28,7 @@ from argparse import ArgumentParser
 import contracts
 
 
+
 def parse_args():
     """Parse edx specific arguments to manage.py"""
     parser = ArgumentParser()

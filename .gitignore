@@ -144,3 +144,4 @@ venv/
 .gitignore
 
 common/lib/alipay-sdk-python-all/
+common/lib/social-core/
