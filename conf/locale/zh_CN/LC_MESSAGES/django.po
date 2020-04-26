@@ -12276,6 +12276,9 @@ msgstr "课程长度："
 msgid "Courses"
 msgstr "课程"
 
+msgid "Discover course"
+msgstr "查找课程"
+
 #: cms/templates/login.html themes/red-theme/cms/templates/login.html
 msgid "Sign In to {studio_name}"
 msgstr "登录{studio_name}"
