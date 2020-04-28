@@ -403,3 +403,31 @@
 
   padding: $baseline/2;
 }
+
+.search-container-box {
+    float: left;
+    margin-right: 10px;
+}
+
+.header-search-container {
+    padding: 5px 20px;
+    font-weight: 400;
+}
+
+.header-search-input {
+    float: left;
+    height: 35px;
+}
+
+.header-search-box {
+    position: relative;
+    float: left;
+}
+
+.header-search-img {
+    width: 25px;
+    height: 25px;
+    position: absolute;
+    top:5px;
+    left: 5px;
+}

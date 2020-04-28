@@ -46,6 +46,7 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
   </div>
   <div class="secondary">
     <div>
+
       % if allows_login:
         % if restrict_enroll_for_course:
           <div class="mobile-nav-item hidden-mobile nav-item">
@@ -55,11 +56,23 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
             <a class="sign-in-btn btn" href="${reverse('course-specific-login', args=[text_type(course.id)])}${login_query()}">${_("Sign in")}</a>
           </div>
         % else:
-          % if allow_public_account_creation:
+        % if allow_public_account_creation:
             <div class="mobile-nav-item hidden-mobile nav-item">
               <a class="register-btn btn" href="/register${login_query()}">${_("Register")}</a>
             </div>
-          % endif
+        % endif
+        % if settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
+            <div class="hidden-mobile search-container-box">
+                <div class="header-search-container">
+                    <form method="get" action="/courses" id="searchform" name="searchform">
+                        <input class="header-search-input" name="search_query" type="text" placeholder="${_("Search for a course")}" />
+                        <div class="header-search-box">
+                            <img src="/static/images/search_button.png" class="header-search-img"/>
+                        </div>
+                    </form>
+                </div>
+            </div>
+          %endif
            <div class="mobile-nav-item hidden-mobile nav-item">
             <a class="btn" href="${support_link}" target="_blank">${_("Help and Support")}</a>
            </div>
@@ -71,3 +84,19 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
     </div>
   </div>
 </nav>
+
+<script>
+    function searchformsubmit(obj) {
+        obj.submit();
+    }
+    $('.header-search-input').on('input',()=>{
+        console.log($('.header-search-input').val())
+        if ($('.header-search-input').val() == '') {
+            $('.header-search-img').removeAttr("onclick");
+            $('.header-search-img').css('cursor', 'auto');
+        } else {
+            $('.header-search-img').attr('onclick',"searchformsubmit(document.searchform);");
+            $('.header-search-img').css('cursor', 'pointer');
+        }
+    })
+</script>

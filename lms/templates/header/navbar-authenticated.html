@@ -81,6 +81,11 @@ from openedx.core.djangoapps.site_configuration import helpers as configuration_
         </a>
       </div>
     % endif
+    % if show_mycourses_tabs:
+    <div class="mobile-nav-item hidden-mobile nav-item">
+        <a href="/dashboard">${_("My courses")}</a>
+    </div>
+    % endif
     <div class="mobile-nav-item hidden-mobile nav-item">
       <a class="help-link" href="${help_link}" target="_blank">${_("Help and Support")}</a>
     </div>

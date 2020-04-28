@@ -133,12 +133,12 @@ from openedx.core.lib.courses import course_image_url
 
             <div class="code-text">
             % if not discount_applied:
-              <div class="code-input" aria-live="polite">
-                <label for="input_code" class="sr">${_('Discount or activation code')}</label>
-                <input type="text" placeholder="${_('discount or activation code')}" id="input_code">
-                <button type="submit" class="blue" id="submit-code">${_('Apply')}</button>
-                <span class="error-text hidden" id="code"></span>
-              </div>
+              <!--<div class="code-input" aria-live="polite">-->
+                <!--<label for="input_code" class="sr">${_('Discount or activation code')}</label>-->
+                <!--<input type="text" placeholder="${_('discount or activation code')}" id="input_code">-->
+                <!--<button type="submit" class="blue" id="submit-code">${_('Apply')}</button>-->
+                <!--<span class="error-text hidden" id="code"></span>-->
+              <!--</div>-->
             % else:
               <div class="code-applied">
                 <span class="green"><span class="icon fa fa-check-square-o" aria-hidden="true"></span>${_('code has been applied')}</span>

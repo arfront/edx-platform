@@ -93,6 +93,7 @@ from util.bad_request_rate_limiter import BadRequestRateLimiter
 from util.db import outer_atomic
 from util.json_request import JsonResponse
 from util.password_policy_validators import normalize_password, validate_password
+from arfrontconfig.models import Lmsbannerlist
 
 log = logging.getLogger("edx.student")
 
@@ -182,9 +183,26 @@ def index(request, extra_context=None, user=AnonymousUser()):
 
     # TODO: Course Listing Plugin required
     context['journal_info'] = get_journals_context(request)
-
+    
+    context['banner_list'] = get_banner_list()
+    print(context['banner_list'])
     return render_to_response('index.html', context)
 
+
+def get_banner_list():
+    banners = Lmsbannerlist.objects.all().order_by('-order_id')
+    banner_list = []
+    if len(banners) == 0:
+        return [{
+            'banner_url': '/static/images/lms_banner.jpg',
+            'index_num': 1
+        }]
+    for i in range(len(banners)):
+        list_dict = {}
+        list_dict['banner_url'] = banners[i].banner_url()
+        list_dict['index_num'] = i + 1
+        banner_list.append(list_dict)
+    return banner_list
 
 def compose_and_send_activation_email(user, profile, user_registration=None):
     """

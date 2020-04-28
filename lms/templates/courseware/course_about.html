@@ -67,7 +67,8 @@ from six import string_types
       %>
     $('#class_enroll_form').on('ajax:complete', function(event, xhr) {
       if(xhr.status == 200) {
-        location.href = "${reverse('dashboard') | n, decode.utf8}";
+        // location.href = "${reverse('dashboard') | n, decode.utf8}";
+        location.href = "${course_target}";
       } else if (xhr.status == 403) {
         location.href = "${reverse('course-specific-register', args=[text_type(course.id)]) | n, decode.utf8 }?course_id=${course.id | n, decode.utf8 }&enrollment_action=enroll";
       } else if (xhr.status == 400) { //This means the user did not have permission
@@ -84,7 +85,7 @@ from six import string_types
     $('#class_enroll_form').on('ajax:complete', function(event, xhr) {
       if(xhr.status == 200) {
         if (xhr.responseText == "") {
-          location.href = "${reverse('dashboard') | n, decode.utf8}";
+          location.href = "${course_target}";
         }
         else {
           location.href = xhr.responseText;
@@ -110,48 +111,50 @@ from six import string_types
 
 <section class="course-info">
 
-  <%block name="course_about_header">
-  <header class="course-profile">
-    <div class="intro-inner-wrapper">
-      <div class="table">
-      <section class="intro">
-        <div class="heading-group">
-          <h1>
+  <div class="course-header-container">
+      <div class="course-displayname-show">
+           <h1>
             ${course.display_name_with_default}
           </h1>
-          <br />
-          <span>${course.display_org_with_default}</span>
-        </div>
+      </div>
+      <div class="course-starttime-show">
+          <h2>${_('Start Date')}: ${course.start}</h2>
+      </div>
+      <div class="course-action-show">
+          %if user.is_authenticated and registered:
+            %if show_courseware_link:
+            <span class="register disabled">${_("You are enrolled in this course")}</span>
+            <div class="course-enroll-button" onclick="javascript:void(window.location.href='${course_target}')">
+            <a href="${course_target}" style="color: black; width: 100%; height: 100%">
+            %endif
 
-        <div class="main-cta">
-        %if user.is_authenticated and registered:
-          %if show_courseware_link:
-            <a href="${course_target}">
-          %endif
-
-          <span class="register disabled">${_("You are enrolled in this course")}</span>
-
-          %if show_courseware_link:
-            <strong class="view-course">${_("View Course")}</strong>
+            %if show_courseware_link:
+                <span class="view-course">${_("View Course")}</span>
             </a>
-          %endif
+            </div>
+             %endif
 
-        %elif in_cart:
-          <span class="add-to-cart">
-            ${Text(_('This course is in your <a href="{cart_link}">cart</a>.')).format(cart_link=cart_link)}
-          </span>
-        % elif is_course_full:
-          <span class="register disabled">
-            ${_("Course is full")}
-          </span>
-        % elif invitation_only and not can_enroll:
-          <span class="register disabled">${_("Enrollment in this course is by invitation only")}</span>
-        ## Shib courses need the enrollment button to be displayed even when can_enroll is False,
-        ## because AnonymousUsers cause can_enroll for shib courses to be False, but we need them to be able to click
-        ## so that they can register and become a real user that can enroll.
-        % elif not is_shib_course and not can_enroll:
-          <span class="register disabled">${_("Enrollment is Closed")}</span>
-        %elif can_add_course_to_cart:
+          %elif in_cart:
+          <div class="course-enroll-button" onclick="javascript:void(window.location.href='${cart_link}')">
+              <span class="add-to-cart">
+                  <a href="${cart_link}" style="color: black;">${Text(_('This course is in your cart.')).format(cart_link=cart_link)}</a>
+              </span>
+          </div>
+          % elif is_course_full:
+          <div class="course-enroll-button">
+              <span class="register disabled">
+                ${_("Course is full")}
+              </span>
+          </div>
+          % elif invitation_only and not can_enroll:
+          <div class="course-enroll-button">
+            <span class="register disabled">${_("Enrollment in this course is by invitation only")}</span>
+          </div>
+          % elif not is_shib_course and not can_enroll:
+          <div class="course-enroll-button">
+            <span class="register disabled">${_("Enrollment is Closed")}</span>
+          </div>
+          %elif can_add_course_to_cart:
           <%
           if user.is_authenticated:
             reg_href = "#"
@@ -164,21 +167,23 @@ from six import string_types
               reg_href = ecommerce_checkout_link
               reg_element_id = ""
           %>
-          <a href="${reg_href}" class="add-to-cart" id="${reg_element_id}">
-            ${Text(_("Add {course_name} to Cart {start_span}({price} USD){end_span}")).format(
-                course_name=course.display_number_with_default,
-                start_span=HTML("<span>"),
-                end_span=HTML("</span>"),
-                price=course_price)}
-          </a>
+          <div class="course-enroll-button add-to-cart" id="${reg_element_id}">
+              <a href="${reg_href}" style="color: black;">
+                ${Text(_("Add {course_name} to Cart {start_span}({price}){end_span}")).format(
+                    course_name=course.display_name_with_default,
+                    start_span=HTML("<span>"),
+                    end_span=HTML("</span>"),
+                    price=course_price)}
+              </a>
+          </div>
           <div id="register_error"></div>
-        %elif allow_anonymous:
-          %if show_courseware_link:
-            <a href="${course_target}">
-            <strong class="view-course">${_("View Course")}</strong>
-            </a>
-          %endif
-        %else:
+          %elif allow_anonymous:
+              %if show_courseware_link:
+                <a href="${course_target}">
+                <strong class="view-course">${_("View Course")}</strong>
+                </a>
+              %endif
+          %else:
           <%
             if ecommerce_checkout:
               reg_href = ecommerce_checkout_link
@@ -189,32 +194,16 @@ from six import string_types
             else:
               href_class = "register"
           %>
-          <a href="${reg_href}" class="${href_class}">
-            ${_("Enroll in {course_name}").format(course_name=course.display_number_with_default)}
-          </a>
+          <div class="course-enroll-button ${href_class}">
+            <a href="${reg_href}" style="color: black;">
+                ${_("Enroll Course")}
+            </a>
+          </div>
           <div id="register_error"></div>
         %endif
-        </div>
 
-      </section>
-      % if get_course_about_section(request, course, "video"):
-      <a href="#video-modal" class="media" rel="leanModal">
-        <div class="hero">
-          <img src="${course_image_urls['large']}" alt="" onerror="javascript:this.src='/static/images/default_course_image.jpg'"/>
-          <div class="play-intro"></div>
-        </div>
-      </a>
-      %else:
-      <div class="media">
-        <div class="hero">
-          <img src="${course_image_urls['large']}" alt="" onerror="javascript:this.src='/static/images/default_course_image.jpg'"/>
-        </div>
       </div>
-      % endif
-    </div>
-      </div>
-  </header>
-  </%block>
+  </div>
 
   <div class="container">
 
@@ -233,7 +222,22 @@ from six import string_types
     </%block>
 
     <div class="course-sidebar">
-      <div class="course-summary">
+          % if get_course_about_section(request, course, "video"):
+          <a href="#video-modal" class="media" rel="leanModal">
+            <div class="hero" style="width: 100px; height: 100px;">
+              <img src="${course_image_urls['large']}" alt="" onerror="javascript:this.src='/static/images/default_course_image.jpg'" style="width: 100%;"/>
+              <div class="play-intro"></div>
+            </div>
+          </a>
+          %else:
+          <div class="media">
+            <div class="hero">
+              <img src="${course_image_urls['large']}" alt="" onerror="javascript:this.src='/static/images/default_course_image.jpg'" style="width: 100%;"/>
+            </div>
+          </div>
+          % endif
+
+      <div class="course-summary" style="margin-top: 20px;">
 
         <%include file="course_about_sidebar_header.html" />
 
