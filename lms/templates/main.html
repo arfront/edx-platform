@@ -187,7 +187,12 @@ from pipeline_mako import render_require_js_path_overrides
 
     <div class="marketing-hero"><%block name="marketing_hero"></%block></div>
 
-    <div class="content-wrapper main-container" id="content" dir="${static.dir_rtl()}">
+% if main_container_padding:
+    <div class="content-wrapper main-container" id="content" dir="${static.dir_rtl()}" >
+% else:
+    <div class="content-wrapper main-container" id="content" dir="${static.dir_rtl()}" style="padding: 0 20px 10px; margin-top: 20px;">
+%endif
+
       ${self.body()}
       <%block name="bodyextra"/>
     </div>

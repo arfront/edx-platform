@@ -185,7 +185,9 @@ def index(request, extra_context=None, user=AnonymousUser()):
     context['journal_info'] = get_journals_context(request)
     
     context['banner_list'] = get_banner_list()
-    print(context['banner_list'])
+    
+    context['main_container_padding'] = True
+
     return render_to_response('index.html', context)
 
 
