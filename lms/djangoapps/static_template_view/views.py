@@ -1,3 +1,4 @@
+# -*- coding=utf-8 -*-
 # View for semi-static templatized content.
 #
 # List of valid templates is explicitly managed for (short-term)
@@ -17,6 +18,7 @@ from edxmako.shortcuts import render_to_response, render_to_string
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from util.cache import cache_if_anonymous
 from util.views import fix_crum_request
+from arfrontconfig.models import AricleContent
 
 valid_templates = []
 
@@ -54,6 +56,13 @@ def render(request, template):
         # This is necessary for the dialog presented with the TOS in /register
         if template == 'honor.html':
             context['allow_iframing'] = True
+        
+        if template in ['privacy.html', 'honor.html', 'tos.html']:
+            context['content'] = ''
+            aritle_content = AricleContent.objects.filter(content_type=template.split('.')[0]).all()
+            if aritle_content:
+                context['content'] = aritle_content[0].content
+        
         # Format Examples: static_template_about_header
         configuration_base = 'static_template_' + template.replace('.html', '').replace('-', '_')
         page_header = configuration_helpers.get_value(configuration_base + '_header')

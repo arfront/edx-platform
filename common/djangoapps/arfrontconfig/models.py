@@ -82,3 +82,21 @@ class Lmsbannerlist(models.Model):
             return self.banner.url
         else:
             return '/static/images/lms_banner.jpg'
+
+CONTENT_TYPES = (
+    ('honor', 'honor'),
+    ('tos', 'tos'),
+    ('privacy', 'privacy')
+)
+
+class AricleContent(models.Model):
+    
+    id = models.AutoField(primary_key=True)
+    content_type = models.CharField(choices=CONTENT_TYPES, unique=True, max_length=32, default='privacy')
+    content = models.TextField()
+    
+    class Meta:
+        db_table = "aritlecontent"
+        app_label = "arfrontconfig"
+        verbose_name = "aricle content"
+        verbose_name_plural = verbose_name
