@@ -24729,3 +24729,30 @@ msgstr "加入学习"
 
 msgid "My courses"
 msgstr "我的课程"
+
+msgid "COURSE_EXAMPLE"
+msgstr "直播课演示"
+
+msgid "Click enroll course"
+msgstr "点击选修"
+
+msgid "Click here to explore the course"
+msgstr "点击这里马上探索课程"
+
+msgid "Click here to enter the live course"
+msgstr "点击这里马上进入直播课程"
+
+msgid "Click on this course"
+msgstr "点击这门课"
+
+msgid "Click to enter live class"
+msgstr "点击进入直播"
+
+msgid "How to do vehicle maintenance"
+msgstr "课堂直播：和中传老师一起学摄影基础"
+
+msgid "Click to enter the course unit"
+msgstr "点击进入课程单元"
+
+msgid "Click to view the course"
+msgstr "点击查看课程"

@@ -271,12 +271,12 @@ ${HTML(fragment.foot_html())}
         var enjoyhint_instance = new EnjoyHint({});
         var enjoyhint_script_steps = [];
         //直播课演示
-        if ($('p.lti-link button').length > 0 && $('.course-name').html() == '直播课演示') {
+        if ($('p.lti-link button').length > 0 && $('.course-name').html() == '${_("COURSE_EXAMPLE")}') {
             enjoyhint_script_steps = [
               {
                 selector:'p.lti-link button',//jquery selector
                 event:'click',
-                description:'点击进入直播',
+                description:'${_("Click to enter live class")}',
                 onBeforeStart:function(){
                     enddomon('live')
                 }

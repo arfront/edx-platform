@@ -372,18 +372,18 @@ from student.models import CourseEnrollment
           {
             selector:'a[href="/courses"]',
             event:'click',
-            description:'点击这里马上探索课程',
+            description:'${_("Click here to explore the course now")}',
           }
         ];
 
         $("a.course-target-link").each(function () {
             // $(this).html() == '直播课演示'
-            if ($(this).html() == '直播课演示') {
+            if ($(this).html() == '${_("COURSE_EXAMPLE")}') {
                 enjoyhint_script_steps = [
                   {
                     selector: this,
                     event:'click',
-                    description:'点击这里马上进入直播课',
+                    description:'${_("Click here to enter the live course")}',
                   }
                 ];
             }

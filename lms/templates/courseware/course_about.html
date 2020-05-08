@@ -462,24 +462,23 @@ from six import string_types
 % if domon_type == 'live':
 <script type="application/javascript">
     $(document).ready(function () {
-        // 直播课演示
-        if ($.trim($('.heading-group').find('h1').html()) == '直播课演示' ) {
+        if ($.trim($('.course-displayname-show').find('h1').html()) == '${_("COURSE_EXAMPLE")}' ) {
             var enjoyhint_instance = new EnjoyHint({});
             var enjoyhint_script_steps = [];
-            if ($.trim($('.main-cta').children('a').html()) == '${_("Enroll in {course_name}").format(course_name=course.display_number_with_default)}') {
+            if ($.trim($('.course-action-show').children('div').children('a').html()) == '${_("Enroll Course")}') {
                 enjoyhint_script_steps = [
                   {
                     selector:'.register',//jquery selector
                     event:'click',
-                    description:'点击选修'
+                    description:'${_("Click enroll course")}'
                   }
                 ];
             } else {
                 enjoyhint_script_steps = [
                   {
-                    selector:'strong.view-course',//jquery selector
+                    selector:'.course-enroll-button',//jquery selector
                     event:'click',
-                    description:'点击查看课程'
+                    description:'${_("Click to view the course")}'
                   }
                 ];
             }

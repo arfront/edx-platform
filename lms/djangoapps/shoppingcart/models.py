@@ -139,7 +139,7 @@ class Order(models.Model):
     # a JSON dump of the CC processor response, for completeness
     processor_reply_dump = models.TextField(blank=True)
     # out_trade_no is unique
-    out_trade_no = models.CharField(unique=True, blank=True, max_length=128)
+    out_trade_no = models.CharField(blank=True, max_length=128)
     order_create_time = models.DateTimeField(null=True, blank=True)
     pay_type = models.CharField(max_length=32, default='alipay', choices=PAY_METHOD)
 

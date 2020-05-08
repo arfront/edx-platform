@@ -196,17 +196,27 @@ from openedx.features.portfolio_project import INCLUDE_PORTFOLIO_UPSELL_MODAL
         var enjoyhint_instance = new EnjoyHint({});
         var enjoyhint_script_steps = [];
 
+        $('h4.subsection-title').each(function () {
+           if ($.trim($(this).text()) == 'Live Class' && !$(this).parent('button').parent('li').hasClass('current')) {
+                enjoyhint_script_steps.push({
+                    selector: this,
+                    event: 'click',
+                    description: '${_("Click to expand the course")}'
+                });
+           }
+        });
+
         $('div.vertical-title').each(function () {
             //课堂直播：和中传老师一起学摄影基础
             //单元
-            if ($.trim($(this).text()) == '课堂直播：和中传老师一起学摄影基础') {
-                enjoyhint_script_steps = [
+            if ($.trim($(this).text()) == '${_("How to do vehicle maintenance")}') {
+                enjoyhint_script_steps.push(
                   {
                     selector:this,//jquery selector
                     event:'click',
-                    description:'点击进入课程单元'
+                    description:'${_("Click to enter the course unit")}'
                   }
-                ];
+                );
             }
         });
 

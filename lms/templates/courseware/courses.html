@@ -103,12 +103,12 @@
         var enjoyhint_instance = new EnjoyHint({});
         var enjoyhint_script_steps = [];
 
-        if ($('article[aria-label="直播课演示"]').length > 0) {
+        if ($('article[aria-label="${_('COURSE_EXAMPLE')}"]').length > 0) {
             enjoyhint_script_steps = [
               {
-                selector:'article[aria-label="直播课演示"]',//jquery selector
+                selector:'article[aria-label="${_('COURSE_EXAMPLE')}"]',//jquery selector
                 event:'click',
-                description:'点击这门课'
+                description:'${_("Click on this course")}'
               }
             ];
         }
