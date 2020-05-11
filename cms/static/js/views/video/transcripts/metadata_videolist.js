@@ -13,7 +13,9 @@ function($, Backbone, _, AbstractEditor, Utils, MessageManager) {
         events: {
             'click .setting-clear': 'clear',
             'keypress .setting-input': 'showClearButton',
-            'click .collapse-setting': 'toggleExtraVideosBar'
+            'click .collapse-setting': 'toggleExtraVideosBar',
+            'click .course-sthree-course': 'jumptothreecourse'
+
         },
 
         templateName: 'metadata-videolist-entry',
@@ -227,6 +229,22 @@ function($, Backbone, _, AbstractEditor, Utils, MessageManager) {
             } else {
                 this.openExtraVideosBar.apply(this, arguments);
             }
+        },
+
+        jumptothreecourse: function(event) {
+              var host=window.location.host;
+              var protocolStr = document.location.protocol;
+              $.ajax({
+                url: protocolStr+ '//' + host + "/api/v1/youtube_account_info/",
+                type: "get",
+                success: function (info) {
+                  if(info['status'] == '10001') {
+                    window.open(info['data']['target_url']);
+                  } else {
+                    alert(info['msg'])
+                  }
+                }
+              });
         },
 
         /**
