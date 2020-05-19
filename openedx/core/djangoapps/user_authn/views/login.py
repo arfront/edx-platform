@@ -1,3 +1,4 @@
+# -*- coding=utf8 -*-
 """
 Views for login / logout and associated functionality
 
@@ -6,6 +7,7 @@ Much of this file was broken out from views.py, previous history can be found th
 
 import logging
 
+import json
 from django.conf import settings
 from django.contrib.auth import authenticate, login as django_login
 from django.contrib.auth.decorators import login_required
@@ -26,7 +28,7 @@ from openedx.core.djangoapps.password_policy import compliance as password_polic
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.util.user_messages import PageLevelMessages
 from openedx.core.djangolib.markup import HTML, Text
-from student.models import LoginFailures
+from student.models import LoginFailures, UserProfile
 from student.views import send_reactivation_email_for_user
 from student.forms import send_password_reset_email_for_user
 from track import segment
@@ -34,9 +36,136 @@ import third_party_auth
 from third_party_auth import pipeline, provider
 from util.json_request import JsonResponse
 from util.password_policy_validators import normalize_password
+from django.views.decorators.http import require_GET, require_http_methods, require_POST
+from django.http import HttpResponse
+from util.sms_send import SmsSend
+import random
+import datetime
+from arfrontconfig.models import RecordVerifyCodeDetail, SmsDetailConfig
+from django.db import transaction
 
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
+
+
+def phone_login(request):
+    context = {}
+    return render_to_response('student_account/phonelogin.html', context)
+
+
+@require_POST
+def login_or_register_get_verify(request):
+    data = json.loads(request.body)
+    if 'type' not in data:
+        return HttpResponse(json.dumps({'msg': _('Parameter error'), 'code': '10002'}))
+    
+    if 'phonenum' not in data or data['phonenum'] == '':
+        return HttpResponse(json.dumps({'msg': _('Phone number cannot be empty'), 'code': '10003'}))
+
+    phonenum = data['phonenum']
+    phonenum = str(phonenum.replace(' ', ''))
+    try:
+        res = RecordVerifyCodeDetail.objects.filter(phonenum=phonenum, is_active=1).order_by('-create_at')[:1].get()
+        if res:
+            is_exist_sms = 1
+        else:
+            is_exist_sms = 0
+    except Exception as e:
+        is_exist_sms = 0
+
+    code = random.randint(1000, 9999)
+    # 发送短信
+    config = SmsDetailConfig.current()
+    if config.enabled:
+        account = config.account
+        pwd = config.pwd
+        content = config.content
+        templateid = config.templateid
+        signid = config.signid
+        sms_send = SmsSend(account, pwd, content, templateid, signid)
+        send_res = sms_send.send_sign_code(phonenum, code)
+    else:
+        return
+    if send_res:
+        if is_exist_sms == 1:
+            RecordVerifyCodeDetail.objects.filter(id=res.id).update(is_active=0)
+            
+        RecordVerifyCodeDetail.objects.create(
+            code=code,
+            phonenum=phonenum,
+            is_active=1,
+            send_type=data['type']
+        )
+        return HttpResponse(json.dumps({'msg': _('success'), 'code': '10001'}))
+
+    return HttpResponse(json.dumps({'msg': _('Failed'), 'code': '10004'}))
+
+
+@require_POST
+def ensure_verify_code(request):
+    data = json.loads(request.body)
+    verify_code = data['verify_code']
+    phonenum = data['phonenum']
+    res = RecordVerifyCodeDetail.objects.filter(phonenum=phonenum, is_active=1, code=verify_code).order_by('-create_at')[:1]
+    if res.exists():
+        nowtime = datetime.datetime.now()
+        res_time = nowtime - (res.get()).create_at.replace(tzinfo=None)
+        if res_time.seconds > 60*3:
+            RecordVerifyCodeDetail.objects.filter(id=res.get().id).update(is_active=0)
+            return HttpResponse(json.dumps({'msg': _('Verification code has expired'), 'code': '10002'}))
+        else:
+            return HttpResponse(json.dumps({'msg': _('Valid verification code'), 'code': '10001'}))
+    else:
+        return HttpResponse(json.dumps({'msg': _('Verification code does not exist'), 'code': '10003'}))
+
+
+@require_POST
+def register_by_phone(request):
+    data = json.loads(request.body)
+    verify_code_is_usefull = 0
+    username = data['username']
+    password = data['password']
+    phonenum = data['phonenum']
+    email = "%s@arfront.com" % phonenum
+    verify_code = data['verify_code']
+    
+    if username == '' or password == '' or phonenum == '' or verify_code == '':
+        return HttpResponse(json.dumps({'msg': _('Parameter error'), 'code': '10002'}))
+    
+    user_res = User.objects.filter(username=username).exists()
+    if user_res:
+        return HttpResponse(json.dumps({'msg': _('Username have been existed'), 'code': '10003'}))
+
+    userprofile_res = UserProfile.objects.filter(phonenum=phonenum).exists()
+    if userprofile_res:
+        return HttpResponse(json.dumps({'msg': _('Phonenum have been existed'), 'code': '10004'}))
+
+    res = RecordVerifyCodeDetail.objects.filter(phonenum=phonenum, is_active=1, code=verify_code).order_by(
+        '-create_at')[:1]
+    if res.exists():
+        nowtime = datetime.datetime.now()
+        res_time = nowtime - (res.get()).create_at.replace(tzinfo=None)
+        if res_time.seconds < 60 * 3:
+            verify_code_is_usefull = 1
+            
+    if verify_code_is_usefull == 0:
+        return HttpResponse(json.dumps({'msg': _('Verify code is invalid'), 'code': '10004'}))
+    
+    try:
+        with transaction.atomic():
+            user = User.objects.create_user(username=username, password=password, email=email)
+            res = UserProfile.objects.create(
+                user_id=user.id,
+                phonenum=phonenum,
+                name=username,
+                courseware='course.xml',
+                allow_certificate=1
+            )
+    except Exception as e:
+        print(e)
+        return HttpResponse(json.dumps({'msg': _('Fail to add user'), 'code': '10005'}))
+     
+    return HttpResponse(json.dumps({'msg': _('Successful add user'), 'code': '10001'}))
 
 
 def _do_third_party_auth(request):
@@ -85,6 +214,26 @@ def _do_third_party_auth(request):
         )
 
         raise AuthFailedError(message)
+    
+
+def _get_user_by_phonenum(request):
+    if 'email' not in request.POST or 'password' not in request.POST:
+        raise AuthFailedError(_('There was an error receiving your login information. Please email us.'))
+    
+    phonenum = request.POST['email']
+    
+    try:
+        userprofile = UserProfile.objects.filter(phonenum=phonenum)
+        if userprofile.exists():
+            return User.objects.get(id=userprofile.get().user_id)
+        else:
+            AUDIT_LOG.warning(u"Login failed - Unknown user phonenum: {0}".format(phonenum))
+        
+    except User.DoesNotExist:
+        if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
+            AUDIT_LOG.warning(u"Login failed - Unknown user phonenum")
+        else:
+            AUDIT_LOG.warning(u"Login failed - Unknown user phonenum: {0}".format(phonenum))
 
 
 def _get_user_by_email(request):
@@ -342,7 +491,10 @@ def login_user(request):
             except AuthFailedError as e:
                 return HttpResponse(e.value, content_type="text/plain", status=403)
         else:
-            email_user = _get_user_by_email(request)
+            if '@' in request.POST.get('email'):
+                email_user = _get_user_by_email(request)
+            else:
+                email_user = _get_user_by_phonenum(request)
 
         _check_shib_redirect(email_user)
         _check_excessive_login_attempts(email_user)

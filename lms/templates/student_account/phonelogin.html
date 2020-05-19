@@ -1,0 +1,134 @@
+<%page expression_filter="h"/>
+<%!
+    import json
+    from django.utils.translation import ugettext as _
+    from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+    from openedx.core.djangolib.js_utils import dump_js_escaped_json
+%>
+<%namespace name='static' file='/static_content.html'/>
+
+<%inherit file="../main.html" />
+
+<%block name="pagetitle">${_("Sign in or Register")}</%block>
+<div class="section-bkg-wrapper">
+    <main id="main" aria-label="Content" tabindex="-1">
+        <div id="content-container" class="login-register-content">
+            <div id="registration-container" class="login-register-phone">
+                <div class="register-header">${_('Phone number registration')}</div>
+                <form id="register-form">
+                <div class="register-item">
+                    <div class="register-title"><div style="float: right; display: fixed;">${_('username')}:</div></div> <input id="username" name="username" type="text" placeholder=""/>
+                </div>
+                <div class="register-item">
+                    <div class="register-title"><div style="float: right; display: fixed;">${_('Password')}:</div></div> <input id="password" name="password" type="password">
+                </div>
+                <div class="register-item">
+                    <div class="register-title"><div style="float: right; display: fixed;"><span>${_('Mobile phone number')}:</span></div></div> <input id="phonenum" name="phonenum" type="text" placeholder="${_('Support Mainland China mobile phone number')}">
+                    <span>
+                        <div class="get_verify">
+                            ${_('get verification code')}
+                        </div>
+                    </span>
+                </div>
+                <div class="register-item">
+                    <div class="register-title"><div style="float: right; display: fixed;">${_('verify code')}:</div></div> <input id="verify_code" name="verify_code" type="text">
+                </div>
+                <div class="register-item">
+                    <div class="phone-register-submit">
+                        ${_('Create Account')}
+                    </div>
+                </div>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script type="text/javascript">
+    var flag = false;
+    $('.get_verify').click(function () {
+        var phonenum = $('#phonenum').val();
+        if (phonenum == '') {
+            alert("${_('please enter a valid phone number')}")
+        }
+
+        if (flag == false) {
+            $.ajax({
+                url: '/login_or_register_get_verify/',
+                contentType: "application/json;charset=UTF-8",
+                type: 'POST',
+                data: JSON.stringify({'type': 'register', 'phonenum': phonenum}),
+                success: function (result) {
+                    if (result.code == '10001') {
+                        flag = true;
+                        $(this).css('cursor', 'not-allowed');
+                        reset_code();
+                    } else {
+                        alert("${_('Failed to obtain verification code')}")
+                    }
+                }
+            });
+        }
+    });
+
+    $('#verify_code').blur(function () {
+        var verify_code = $(this).val();
+        var phonenum = $('#phonenum').val();
+        if (verify_code != '' && phonenum != '') {
+            $.ajax({
+                url: '/ensure_verify_code/',
+                contentType: "application/json;charset=UTF-8",
+                type: 'POST',
+                data: JSON.stringify({'verify_code': verify_code, 'phonenum': phonenum}),
+                success: function (result) {
+                    if (result.code == '10001') {
+                        $('#verify_code').css({'border': '1px solid green'})
+                    } else {
+                        $('#verify_code').css({'border':'1px solid red'})
+                    }
+                }
+            })
+        }
+    });
+
+    $('.phone-register-submit').click(function () {
+        if ($('#username').val() == '' || $('#password').val() == '' || $('#phonenum').val() == '' || $('#verify_code') == '') {
+            alert("${_('Please check the input box')}");
+        } else {
+            var formObject = {};
+            var formArray =$("#register-form").serializeArray();
+            $.each(formArray,function(i,item){
+                formObject[item.name] = item.value;
+            });
+           $.ajax({
+               url: '/register_by_phone/',
+               contentType: "application/json;charset=UTF-8",
+               type: 'POST',
+               data: JSON.stringify(formObject),
+               success: function (result) {
+                   if (result.code == '10001') {
+                       alert("${_('registration success')}");
+                       window.location.href = '/login';
+                   } else {
+                        alert(result.msg);
+                    }
+               }
+           })
+        }
+
+    });
+
+    function reset_code() {
+        var time = 60;
+        var timer = setInterval(function(){
+            time--;
+            $(".get_verify").text("${_('Resend after (@)s')}".replace('@', time));
+            if(time==0){
+                clearInterval(timer);
+                $(".get_verify").text("${_('get verification code')}");
+                $('.get_verify').css('cursor', 'point');
+                flag = false;
+            }
+        },1000);
+    }
+</script>

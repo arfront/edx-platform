@@ -797,7 +797,7 @@
     &:first-of-type {
       margin-top: 20px;
     }
-        
+
     font-size: 16px;
     line-height: 1.5;
     color: $gray-d2;
@@ -889,5 +889,70 @@
 
 body.open-modal {
   overflow: hidden;
+}
+
+.register-header {
+    margin-top: 30px;
+    width: 100%;
+    height: 50px;
+    text-align: center;
+    font-size: 20px;
+}
+
+.login-register-phone {
+    background: #fff;
+    min-height: 100%;
+    margin: 0 auto;
+    padding-left: 10px;
+    padding-right: 10px;
+    display: block;
+    max-width: 800px;
+}
+
+.register-item {
+    width: 100%;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+.register-title {
+    float: left;
+    display:inline;
+    width: 200px;
+    line-height: 30px;
+    margin-right: 20px;
+}
+
+.register-item input {
+    height: 30px;
+    width: 300px;
+}
+
+.get_verify {
+    display:inline;
+    float: right;
+    width: 130px;
+    height: 22px;
+    line-height: 22px;
+    border-radius: 5px;
+    text-align: center;
+    border: 1px solid #0075b4;
+    padding: 5px 5px;
+    background-color: #0075b4;
+    color: white;
+    cursor: pointer;
+    margin-left: 20px;
+}
+
+.phone-register-submit {
+    float: right;
+    margin-right: 160px;
+    width: 160px;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    color: white;
+    background-color: #0075b4;
+    cursor: pointer;
 }
 
