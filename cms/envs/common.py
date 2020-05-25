@@ -300,7 +300,7 @@ FEATURES = {
     'ALLOW_ALL_ADVANCED_COMPONENTS': True,
 
     # Allow public account creation
-    'ALLOW_PUBLIC_ACCOUNT_CREATION': False,
+    'ALLOW_PUBLIC_ACCOUNT_CREATION': True,
 
     # Whether or not the dynamic EnrollmentTrackUserPartition should be registered.
     'ENABLE_ENROLLMENT_TRACK_USER_PARTITION': True,
