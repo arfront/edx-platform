@@ -45,6 +45,7 @@ from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.verified_track_content import views as verified_track_content_views
 from openedx.features.enterprise_support.api import enterprise_enabled
+from openedx.core.djangoapps.user_authn.views.login import phone_login, login_or_register_get_verify, ensure_verify_code, register_by_phone
 from ratelimitbackend import admin
 from static_template_view import views as static_template_view_views
 from staticbook import views as staticbook_views
@@ -68,6 +69,10 @@ handler404 = static_template_view_views.render_404
 handler500 = static_template_view_views.render_500
 
 urlpatterns = [
+    url(r'^phoneregister/', phone_login),
+    url(r'^login_or_register_get_verify/', login_or_register_get_verify),
+    url(r'^ensure_verify_code/', ensure_verify_code),
+    url(r'^register_by_phone/', register_by_phone),
     url(r'^MP_verify_a3W87AwAfQ0UMMUV.txt', WechatFileDownloadView.as_view()),
     url(r'^$', branding_views.index, name='root'),   # Main marketing page, or redirect to courseware
 

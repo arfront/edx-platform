@@ -24756,3 +24756,66 @@ msgstr "点击进入课程单元"
 
 msgid "Click to view the course"
 msgstr "点击查看课程"
+
+msgid "Mobile registration click"
+msgstr "手机注册点击"
+
+msgid "here"
+msgstr "这里"
+
+msgid "get verification code"
+msgstr "获取验证码"
+
+msgid "Support Mainland China mobile phone number"
+msgstr "支持中国大陆手机号"
+
+msgid "verify code"
+msgstr "验证码"
+
+msgid "please enter a valid phone number"
+msgstr "请输入正确的手机号"
+
+msgid "Failed to obtain verification code"
+msgstr "获取验证码失败"
+
+msgid "registration success"
+msgstr "注册成功"
+
+msgid "Resend after (@)s"
+msgstr "(@)秒后重发"
+
+msgid "Parameter error"
+msgstr "参数错误"
+
+msgid "Phone number cannot be empty"
+msgstr "手机号不能为空"
+
+msgid "Verification code has expired"
+msgstr "验证码已过期"
+
+msgid "Valid verification code"
+msgstr "有效的验证码"
+
+msgid "Verification code does not exist"
+msgstr "验证码不存在"
+
+msgid "Username have been existed"
+msgstr "用户已经存在"
+
+msgid "Phonenum have been existed"
+msgstr "手机号已存在"
+
+msgid "Verify code is invalid"
+msgstr "验证码已失效"
+
+msgid "Fail to add user"
+msgstr "添加用户失败"
+
+msgid "Successful add user"
+msgstr "添加用户成功"
+
+msgid "Please check the input box"
+msgstr "请检查输入框"
+
+msgid "Phone number registration"
+msgstr "手机号注册"

@@ -7,6 +7,10 @@
 		<a href="#login" class="form-toggle" data-type="login"><%- gettext("Sign in.") %></a>
 	</div>
 <% } %>
+<div class="toggle-form">
+    <span><%- gettext('Mobile registration click') %></span>
+    <a href="/phoneregister"><%- gettext('here') %></a>
+</div>
 
 <form id="register" class="register-form" autocomplete="off" tabindex="-1" method="POST">
 

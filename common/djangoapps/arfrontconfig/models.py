@@ -100,3 +100,34 @@ class AricleContent(models.Model):
         app_label = "arfrontconfig"
         verbose_name = "aricle content"
         verbose_name_plural = verbose_name
+
+
+class RecordVerifyCodeDetail(models.Model):
+    
+    id = models.AutoField(primary_key=True)
+    phonenum = models.CharField(max_length=128, default='', blank=True)
+    code = models.CharField(max_length=128, default='', blank=True)
+    is_active = models.IntegerField(default=1, verbose_name='验证吗是否有效')  # 0 无效 1　有效
+    send_type = models.CharField(default='', max_length=100)
+    create_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        db_table = 'recordverifycodedetail'
+        app_label = "arfrontconfig"
+        verbose_name = "record verify code detail"
+        verbose_name_plural = verbose_name
+    
+    
+class SmsDetailConfig(ConfigurationModel):
+    
+    account = models.CharField(max_length=128, default='', verbose_name='Account')
+    pwd = models.CharField(max_length=128, default='', verbose_name='Pwd')
+    content = models.CharField(max_length=256, default='', verbose_name='Content')
+    templateid = models.CharField(max_length=128, default='', verbose_name='TemplateId')
+    signid = models.CharField(max_length=128, default='', verbose_name='SignId')
+    
+    class Meta:
+        db_table = "smsdetailconfig"
+        app_label = "arfrontconfig"
+        verbose_name = "Sms detail"
+        verbose_name_plural = verbose_name

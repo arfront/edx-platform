@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.contrib import admin
-from .models import Youtubeaccountconfig, WeihouaccountConfig, AlipayinfoConfig, Lmsbannerlist, AricleContent
+from .models import Youtubeaccountconfig, WeihouaccountConfig, AlipayinfoConfig, Lmsbannerlist, AricleContent, SmsDetailConfig
 
 # Register your models here.
 class YoutubeaccountconfigAdmin(admin.ModelAdmin):
@@ -30,3 +30,8 @@ class AricleContentAdmin(admin.ModelAdmin):
     list_display = ['id', 'content_type']
     
 admin.site.register(AricleContent, AricleContentAdmin)
+
+class SmsDetailConfigAdmin(admin.ModelAdmin):
+    list_display = ['account', 'pwd', 'content', 'templateid', 'signid']
+
+admin.site.register(SmsDetailConfig, SmsDetailConfigAdmin)

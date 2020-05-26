@@ -10551,3 +10551,9 @@ msgstr "失败用户信息："
 
 msgid "Import users from dingtalk"
 msgstr "从钉钉导入用户"
+
+msgid "Mobile registration click"
+msgstr "手机注册点击"
+
+msgid "here"
+msgstr "这里"

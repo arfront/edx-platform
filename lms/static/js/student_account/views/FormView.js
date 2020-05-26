@@ -169,8 +169,11 @@
                     }
 
                     if (key) {
-                        validation = this.validate(elements[i]);
-                        if (validation.isValid) {
+                        if (key != 'email') {
+                          validation = this.validate(elements[i]);
+                        }
+
+                        if (key === 'email' || validation.isValid) {
                             obj[key] = $el.attr('type') === 'checkbox' ? $el.is(':checked') : $el.val();
                             $el.removeClass('error');
                             $label.removeClass('error');
