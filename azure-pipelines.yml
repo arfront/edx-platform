@@ -1,0 +1,78 @@
+trigger:
+- ironwood-master
+
+pool: 'docker'
+
+steps:
+- task: UsePythonVersion@0
+  displayName: 'Using Python36'
+  inputs:
+    versionSpec: '$(PYTHON_VERSION)'
+    architecture: 'x64'
+
+- task: PythonScript@0
+  displayName: 'Export project path'
+  inputs:
+    scriptSource: 'inline'
+    script: |
+      """Search all subdirectories for `manage.py`."""
+      from glob import iglob
+      from os import path
+      # Python >= 3.5
+      manage_py = next(iglob(path.join('**', 'manage.py'), recursive=True), None)
+      if not manage_py:
+          raise SystemExit('Could not find a Django project')
+      project_location = path.dirname(path.abspath(manage_py))
+      print('Found Django project in', project_location)
+      print('##vso[task.setvariable variable=projectRoot]{}'.format(project_location))
+- task: DownloadPipelineArtifact@2
+  displayName: 'Download tutor from pipline'
+  inputs:
+    buildType: 'specific'
+    project: '2a2c366f-cc45-484c-9cb4-b85fb801f4c0'
+    definition: '45'
+    buildVersionToDownload: 'latest'
+    artifactName: 'tutor'
+    targetPath: '$(Pipeline.Workspace)'
+
+- task: CmdLine@2
+  displayName: 'Install tutor'
+  inputs:
+    script: |
+      export LC_ALL=C.UTF-8
+      export LANG=C.UTF-8
+      pip3 install -e .
+    workingDirectory: '$(Pipeline.Workspace)'
+
+- task: CmdLine@2
+  displayName: 'Tutor config'
+  inputs:
+    script: 'tutor config save --set DOCKER_IMAGE_OPENEDX=arfront/kh-academy:latest'
+    workingDirectory: '$(System.ArtifactsDirectory)'
+
+- task: CmdLine@2
+  displayName: 'Tutor build openedx images'
+  inputs:
+    script: 'tutor images build openedx --build-arg EDX_PLATFORM_REPOSITORY=https://github.com/arfront/edx-platform.git --build-arg EDX_PLATFORM_VERSION=$(SourceBranchName)'
+
+- task: CmdLine@2
+  displayName: 'Tag openedx image with build id'
+  inputs:
+    script: 'docker tag arfront/kh-academy:latest arfront/kh-academy:$(Build.BuildId)'
+
+- task: CmdLine@2
+  inputs:
+    script: |
+      docker push arfront/kh-academy:latest
+      docker push arfront/kh-academy:$(Build.BuildId)
+
+- task: SSH@0
+  displayName: 'Synchronous images to harbor'
+  inputs:
+    sshEndpoint: 'agent-ningxia'
+    commands: |
+      docker pull arfront/kh-academy:$(Build.BuildId)
+      docker tag  arfront/kh-academy:$(Build.BuildId) harbor.arfront.cn/kh-academy/kh-academy:$(Build.BuildId)
+      docker tag  arfront/kh-academy:$(Build.BuildId) harbor.arfront.cn/kh-academy/kh-academy:latest
+      docker push harbor.arfront.cn/kh-academy/kh-academy:$(Build.BuildId)
+      docker push harbor.arfront.cn/kh-academy/kh-academy:latest
