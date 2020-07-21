@@ -125,14 +125,14 @@ from six import string_types
       % if get_course_about_section(request, course, "video"):
       <a href="#video-modal" class="media" rel="leanModal">
         <div class="hero">
-          <img src="${course_image_urls['large']}" alt="" />
+          <img src="${course_image_urls['large']}" alt=""  onerror="javascript:this.src='/static/images/default_course_image.jpg'"/>
           <div class="play-intro"></div>
         </div>
       </a>
       %else:
       <div class="media">
         <div class="hero">
-          <img src="${course_image_urls['large']}" alt="" />
+          <img src="${course_image_urls['large']}" alt=""  onerror="javascript:this.src='/static/images/default_course_image.jpg'"/>
         </div>
       </div>
       % endif
@@ -298,3 +298,84 @@ from six import string_types
 <%static:require_module_async module_name="js/dateutil_factory" class_name="DateUtilFactory">
     DateUtilFactory.transform(iterationKey=".localized_datetime");
 </%static:require_module_async>
+
+<script type="text/javascript" src="${static.url('common/js/vendor/jquery.js')}"></script>
+<script src="https://g.alicdn.com/dingding/dingtalk-jsapi/2.7.13/dingtalk.open.js"></script>
+<script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.4.0.js"></script>
+<script type="application/javascript">
+    var $2 = $.noConflict();
+    $2('.fa-dingtalk').click(function () {
+        var dingtalk_target_url = $2('#dingtalk_target_url').html();
+        var dingtalk_text = $2('#dingtalk_text').html();
+        var course_image_url = $2('#course_image_url').html();
+        var dingtalk_title = $2('#dingtalk_title').html();
+        if (dd.env.platform=="notInDingTalk") {
+            alert('please open it in DingTalk')
+        } else {
+            dd.biz.util.share({
+                type: 1,//分享类型，0:全部组件 默认；1:只能分享到钉钉；2:不能分享，只有刷新按钮
+                url: dingtalk_target_url,
+                title: dingtalk_title,
+                content: dingtalk_text,
+                image: course_image_url,
+                onSuccess : function(info) {
+                },
+                onFail : function(err) {
+                }
+            })
+        }
+    });
+
+    $2('.fa-wechat').click(function () {
+        var dingtalk_target_url = $2('#dingtalk_target_url').html();
+        var dingtalk_text = $2('#dingtalk_text').html();
+        var course_image_url = $2('#course_image_url').html();
+        var dingtalk_title = $2('#dingtalk_title').html();
+        var now_url = window.location.href;
+        var host= window.location.host;
+        var protocolStr = document.location.protocol;
+        data = {
+            "url": now_url
+        }
+        $2.ajax({
+            url:  protocolStr+ '//' + host + "/api/courses/v1/coursessharewechat/",
+            type: "POST",
+            data: data,
+            dataType: "json",
+            async: false,
+            success: function (info) {
+                if (info['status'] == '10001') {
+                    var timestamp = info['data']['timestamp'];
+                    var noncestr = info['data']['noncestr'];
+                    var signature = info['data']['signature'];
+                    var appid = info['data']['appid']
+                } else {
+                    alert(info['msg'])
+                }
+                wx.config({
+                  debug: false, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+                  appId: appid, // 必填，公众号的唯一标识
+                  timestamp: timestamp, // 必填，生成签名的时间戳
+                  nonceStr: noncestr, // 必填，生成签名的随机串
+                  signature: signature,// 必填，签名
+                  jsApiList: [
+                      'updateAppMessageShareData'
+                  ] // 必填，需要使用的JS接口列表
+                });
+                wx.ready(function () {   //需在用户可能点击分享按钮前就先调用
+                  wx.updateAppMessageShareData({
+                    title: dingtalk_title, // 分享标题
+                    desc: dingtalk_text, // 分享描述
+                    link: dingtalk_target_url, // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+                    imgUrl: course_image_url, // 分享图标
+                    success: function () {
+                    }
+                  })
+                });
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        });
+    })
+</script>

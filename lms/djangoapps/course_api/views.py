@@ -1,7 +1,14 @@
 """
 Course API Views
 """
-
+import search
+import requests
+import logging
+import time
+import os
+import json
+import uuid
+import hashlib
 
 from django.core.exceptions import ValidationError
 from django.core.paginator import InvalidPage
@@ -9,6 +16,9 @@ from edx_rest_framework_extensions.paginators import NamespacedPageNumberPaginat
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.throttling import UserRateThrottle
 from rest_framework.exceptions import NotFound
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.status import HTTP_200_OK
 
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 
@@ -16,6 +26,8 @@ from . import USE_RATE_LIMIT_2_FOR_COURSE_LIST_API, USE_RATE_LIMIT_10_FOR_COURSE
 from .api import course_detail, list_course_keys, list_courses
 from .forms import CourseDetailGetForm, CourseIdListGetForm, CourseListGetForm
 from .serializers import CourseDetailSerializer, CourseKeySerializer, CourseSerializer
+from wechatuser.models import WechatUserconfig
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 
 
 @view_auth_classes(is_authenticated=False)

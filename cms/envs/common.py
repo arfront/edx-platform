@@ -159,8 +159,8 @@ PLATFORM_TWITTER_ACCOUNT = "@YourPlatformTwitterAccount"
 # Dummy secret key for dev/test
 SECRET_KEY = 'dev key'
 FAVICON_PATH = 'images/favicon.ico'
-STUDIO_NAME = _("Your Platform Studio")
-STUDIO_SHORT_NAME = _("Studio")
+STUDIO_NAME = _("K&H Academy")
+STUDIO_SHORT_NAME = _("K&H")
 FEATURES = {
     'GITHUB_PUSH': False,
 

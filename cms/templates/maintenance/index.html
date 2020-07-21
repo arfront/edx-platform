@@ -16,5 +16,24 @@ from django.urls import reverse
         </li>
         % endfor
     </ul>
+    <div class="dingtalk-bottom-box">
+        <a href="#" class="dingtalk-bottom">${_('Import users from dingtalk')}</a>
+        <a href="#" class="dingtalk-button-delete">${_('Delete terminated employee')}</a>
+        <input id="uploadfile" type="file" class="uploadfile"/>
+        <a href="#" class="csv-button">${_('Import User from csv file')}</a>
+    </div>
+    <div class="dingtalk-user-info-box is-shown">
+        <p>${_("Success user info:")}</p>
+        <ul class="dingtalk-user-info-list" id="success_add_user_info">
+        </ul>
+        <p>${_("fail user info:")}</p>
+        <ul class="dingtalk-user-info-list" id="fail_add_user_info">
+        </ul>
+    </div>
+    <div class="dingtalk-delete-result result-is-shown">
+        <p>${_('Delete result:')}&nbsp;&nbsp;&nbsp;&nbsp;<span id="dingtalk-delete-msg"></span></p>
+        <ul class="dingtalk-delete-user-detail">
+        </ul>
+    </div>
 </div>
 </%block>

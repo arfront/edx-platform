@@ -2358,6 +2358,7 @@ INSTALLED_APPS = [
 
     'third_party_auth',
     'dingtalkuser',
+    'wechatuser',
 
     # System Wide Roles
     'openedx.core.djangoapps.system_wide_roles',

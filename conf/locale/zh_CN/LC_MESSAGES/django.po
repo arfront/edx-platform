@@ -15457,6 +15457,14 @@ msgstr "我刚通过 {account}：{url} 选修了 {number} {title}"
 msgid "I just enrolled in {number} {title} through {platform} {url}"
 msgstr "我刚通过 {platform} {url} 选修了 {number} {title}"
 
+# lms/templates/courseware/course_about_sidebar_header.html
+msgid "I just enrolled in {number} {title} through {platform}"
+msgstr "我刚通过 {platform} 选修了 {number} {title}"
+
+# lms/templates/courseware/course_about_sidebar_header.html
+msgid "course of {platform} sharing"
+msgstr "{platform}课程分享"
+
 #: lms/templates/courseware/course_about_sidebar_header.html
 msgid "Take a course with {platform} online"
 msgstr "在 {platform} 上在线学习课程"

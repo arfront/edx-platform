@@ -10730,3 +10730,115 @@ msgstr "失败用户信息："
 
 msgid "Import users from dingtalk"
 msgstr "从钉钉导入用户"
+
+msgid "K&H Academy"
+msgstr "科海商学院"
+
+msgid "K&H"
+msgstr "科海"
+
+msgid "S3 Video Upload"
+msgstr "S3视频上传"
+
+msgid "Successfully deleted users"
+msgstr "删除用户成功"
+
+msgid "No users to delete"
+msgstr "没有用户被删除"
+
+msgid "Delete result:"
+msgstr "删除结果："
+
+msgid "Delete terminated employee"
+msgstr "删除离职员工"
+
+msgid "No config of wechat can be used"
+msgstr "无可用的微信配置"
+
+msgid "Teacher login"
+msgstr "教员登录"
+
+msgid "Successfully get arfront youtube account info"
+msgstr "获取科海youtube账户信息成功"
+
+msgid "No config of arfront youtube account"
+msgstr "科海youtube账户信息未设置"
+
+msgid "Help and Support"
+msgstr "帮助和支持"
+
+msgid "No login in Dingtalk"
+msgstr "钉钉内免登陆"
+
+msgid "s later, here to go to the home page"
+msgstr "秒后， 将自动跳转到首页"
+
+msgid "Go to home page"
+msgstr "返回首页"
+
+msgid "Login failed"
+msgstr "登录失败"
+
+msgid "The user not in KH&academy, Login failed"
+msgstr "该用户不在科海商学院内,登录失败"
+
+msgid "Detected that you are open in DingTalk, are you logged in?"
+msgstr "检测到您在钉钉内打开,是否登录?"
+
+msgid "Waiting, please wait"
+msgstr "等待中，请稍后"
+
+msgid "Email existed in database"
+msgstr "该email已经存在，无法继续录入该用户"
+
+msgid "Import User from csv file"
+msgstr "从csv文件导入用户"
+
+msgid "Not exist alipay config"
+msgstr "支付宝配置信息不存在"
+
+msgid "Not exist paying order, please add some courses in shoppingcart, and pay it"
+msgstr "不存在支付中的订单，请先在购物车中添加一些课程再支付"
+
+msgid "You have an unprocessed order, please continue to place the order after processing, Please wait a moment, will jump to the unprocessed order page"
+msgstr "您有一个未处理的订单，请现行处理完成后再下单，请稍等，将跳转到未处理的订单页面"
+
+msgid "Waiting to check the payment result, will jump soon, please wait ..."
+msgstr "等待查询支付结果，即将跳转，请稍后......"
+
+#: lms/templates/courseware/course_about.html
+msgid "Add {course_name} to Cart {start_span}({price}){end_span}"
+msgstr "添加{course_name}到购物车, 价格{start_span}({price}){end_span}"
+
+msgid "Join learning"
+msgstr "加入学习"
+
+msgid "My courses"
+msgstr "我的课程"
+
+msgid "COURSE_EXAMPLE"
+msgstr "直播课演示"
+
+msgid "Click enroll course"
+msgstr "点击选修"
+
+msgid "Click here to explore the course"
+msgstr "点击这里马上探索课程"
+
+msgid "Click here to enter the live course"
+msgstr "点击这里马上进入直播课程"
+
+msgid "Click on this course"
+msgstr "点击这门课"
+
+msgid "Click to enter live class"
+msgstr "点击进入直播"
+
+msgid "How to do vehicle maintenance"
+msgstr "课堂直播：和中传老师一起学摄影基础"
+
+msgid "Click to enter the course unit"
+msgstr "点击进入课程单元"
+
+msgid "Click to view the course"
+msgstr "点击查看课程"

@@ -36,7 +36,51 @@
       }
     }
   }
+  .dingtalk-bottom-box {
+    max-width: 1280px;
+    margin: 20px auto;
 
+      .dingtalk-bottom, .dingtalk-button-delete .csv-button{
+        margin-left: 13px;
+        background-color: #0075b4;
+        border: none;
+        color: white;
+        padding: 15px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 14px;
+      }
+      .uploadfile {
+        margin-left: 13px;
+        width: 200px;
+        height: 40px;
+        color: #888;
+        background: #fafafa;
+        text-align: center;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        overflow: hidden;
+      }
+      .dingtalk-bottom:hover {
+        background-color: #045d96;
+      }
+      .dingtalk-button-delete:hover {
+        background-color: #045d96;
+        color: white;
+      }
+  }
+  .dingtalk-user-info-box, .dingtalk-delete-result {
+    max-width: 1280px;
+    margin: 20px auto;
+  }
+  .is-shown, .result-is-shown {
+      display: none;
+  }
+  .dingtalk-user-info-list {
+    margin-left: 13px;
+  }
+  
   .maintenance-form {
     width: 60%;
     margin: auto;
