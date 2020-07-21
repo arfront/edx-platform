@@ -328,6 +328,24 @@ xblock==1.3.1             # via -r requirements/edx/testing.txt, acid-xblock, cr
 xmlsec==1.3.3             # via -r requirements/edx/testing.txt, python3-saml
 xss-utils==0.1.3          # via -r requirements/edx/testing.txt
 zipp==1.0.0               # via -c requirements/edx/../constraints.txt, -r requirements/edx/testing.txt, importlib-metadata, importlib-resources
+zendesk==1.1.1
+zope.interface==4.6.0
+pypinyin==0.36.0
+rsa==4.0
+alipay-sdk-python==3.3.398
+
+# all xblock in there
+# pdf
+git+https://github.com/MarCnu/pdfXBlock.git@master
+# 3d viewer
+-e common/lib/xblock_3d_viewer/mt3d
+# audio
+git+https://github.com/pmitros/AudioXBlock.git@master
+# Group project
+#-e git+https://github.com/open-craft/xblock-group-project-v2.git@0.4.9#egg=xblock-group-project-v2
+# livevideo
+git+https://github.com/wrydeveloper/livevideo_xblock.git@develop
+
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools

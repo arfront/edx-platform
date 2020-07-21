@@ -2357,6 +2357,7 @@ INSTALLED_APPS = [
     'openedx.core.djangoapps.oauth_dispatch.apps.OAuthDispatchAppConfig',
 
     'third_party_auth',
+    'dingtalkuser',
 
     # System Wide Roles
     'openedx.core.djangoapps.system_wide_roles',

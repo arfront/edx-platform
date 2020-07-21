@@ -12596,6 +12596,26 @@ msgstr "可使用标签的字典"
 msgid "Studio Administration"
 msgstr "Studio管理"
 
+#: cms/djangoapps/api/v1/views/kh_user_manage.py
+msgid "No secret or key in config"
+msgstr "配置中没有秘钥或密匙"
+
+#: cms/djangoapps/api/v1/views/kh_user_manage.py
+msgid "No email information"
+msgstr "没有email信息"
+
+#: cms/djangoapps/api/v1/views/kh_user_manage.py
+msgid "Synchronous user successful"
+msgstr "同步用户信息成功"
+
+#: cms/djangoapps/api/v1/views/kh_user_manage.py
+msgid "User created successfuly"
+msgstr "创建用户成功"
+
+#: cms/djangoapps/api/v1/views/kh_user_manage.py
+msgid "User existed in databases"
+msgstr "该用户已存在"
+
 #: cms/templates/404.html cms/templates/error.html
 #: lms/templates/static_templates/404.html
 msgid "Page Not Found"
