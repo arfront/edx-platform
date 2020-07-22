@@ -15,6 +15,8 @@ urlpatterns = [
     url(r'^404$', views.render_404, name='static_template_view.views.render_404'),
     url(r'^500$', views.render_500, name='static_template_view.views.render_500'),
 
+    url(r'^about$', views.render, {'template': 'about.html'}, name="about"),
+
     url(r'^blog$', views.render, {'template': 'blog.html'}, name="blog"),
     url(r'^contact$', views.render, {'template': 'contact.html'}, name="contact"),
     url(r'^donate$', views.render, {'template': 'donate.html'}, name="donate"),
