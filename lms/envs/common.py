@@ -71,6 +71,8 @@ ENABLE_JASMINE = False
 LMS_ROOT_URL = 'https://localhost:18000'
 LMS_INTERNAL_ROOT_URL = LMS_ROOT_URL
 LMS_ENROLLMENT_API_PATH = "/api/enrollment/v1/"
+CMS_ROOT_URL = "http://localhost:8001"
+
 
 # Default choices for role dropdown in the membership tab of the instructor dashboard
 # This setting is used when a site does not define its own choices via site configuration
@@ -2627,7 +2629,7 @@ MKTG_URL_LINK_MAP = {
 
 STATIC_TEMPLATE_VIEW_DEFAULT_FILE_EXTENSION = 'html'
 
-SUPPORT_SITE_LINK = ''
+SUPPORT_SITE_LINK = 'https://khholdings.freshdesk.com/'
 ID_VERIFICATION_SUPPORT_LINK = ''
 PASSWORD_RESET_SUPPORT_LINK = ''
 ACTIVATION_EMAIL_SUPPORT_LINK = ''

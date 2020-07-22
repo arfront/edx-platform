@@ -24667,6 +24667,9 @@ msgstr "删除离职员工"
 msgid "No config of wechat can be used"
 msgstr "无可用的微信配置"
 
+msgid "Are you teacher?"
+msgstr "您是教师？"
+
 msgid "Teacher login"
 msgstr "教员登录"
 

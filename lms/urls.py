@@ -11,6 +11,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.views.generic.base import RedirectView
 from edx_api_doc_tools import make_docs_urls
 from ratelimitbackend import admin
+from course_api.views import WechatFileDownloadView
+
 
 from branding import views as branding_views
 from debug import views as debug_views
@@ -74,6 +76,7 @@ handler404 = static_template_view_views.render_404
 handler500 = static_template_view_views.render_500
 
 notification_prefs_urls = [
+    
     url(r'^notification_prefs/enable/', notification_prefs_views.ajax_enable),
     url(r'^notification_prefs/disable/', notification_prefs_views.ajax_disable),
     url(r'^notification_prefs/status/', notification_prefs_views.ajax_status),
@@ -94,6 +97,8 @@ notification_prefs_urls = [
 
 
 urlpatterns = [
+    url(r'^MP_verify_a3W87AwAfQ0UMMUV.txt', WechatFileDownloadView.as_view()),
+
     url(r'^$', branding_views.index, name='root'),  # Main marketing page, or redirect to courseware
 
     url(r'', include('student.urls')),
