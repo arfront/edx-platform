@@ -5,6 +5,7 @@ import urllib
 import requests
 import uuid
 import pypinyin
+import imp
 import datetime
 import random
 import traceback
@@ -14,8 +15,7 @@ from django.conf import settings
 from django.db import connections, transaction
 from django.utils.translation import ugettext_lazy as _
 
-reload(sys)
-sys.setdefaultencoding("utf8")
+imp.reload(sys)
 
 log = logging.getLogger(__name__)
 

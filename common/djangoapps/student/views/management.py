@@ -466,6 +466,25 @@ def disable_account_ajax(request):
     return JsonResponse(context)
 
 
+@login_required
+@ensure_csrf_cookie
+def change_setting(request):
+    """
+    JSON call to change a profile setting: Right now, location
+    """
+    # TODO (vshnayder): location is no longer used
+    u_prof = UserProfile.objects.get(user=request.user)  # request.user.profile_cache
+    if 'location' in request.POST:
+        u_prof.location = request.POST['location']
+    u_prof.save()
+
+    return JsonResponse({
+        "success": True,
+        "location": u_prof.location,
+    })
+
+
+
 @receiver(post_save, sender=User)
 def user_signup_handler(sender, **kwargs):  # pylint: disable=unused-argument
     """
@@ -543,6 +562,420 @@ def activate_account(request, key):
             )
 
     return redirect('dashboard')
+
+
+
+@require_http_methods(['POST'])
+def password_change_request_handler(request):
+    """Handle password change requests originating from the account page.
+
+    Uses the Account API to email the user a link to the password reset page.
+
+    Note:
+        The next step in the password reset process (confirmation) is currently handled
+        by student.views.password_reset_confirm_wrapper, a custom wrapper around Django's
+        password reset confirmation view.
+
+    Args:
+        request (HttpRequest)
+
+    Returns:
+        HttpResponse: 200 if the email was sent successfully
+        HttpResponse: 400 if there is no 'email' POST parameter
+        HttpResponse: 403 if the client has been rate limited
+        HttpResponse: 405 if using an unsupported HTTP method
+
+    Example usage:
+
+        POST /account/password
+
+    """
+
+    limiter = BadRequestRateLimiter()
+    if limiter.is_rate_limit_exceeded(request):
+        AUDIT_LOG.warning("Password reset rate limit exceeded")
+        return HttpResponseForbidden()
+
+    user = request.user
+    # Prefer logged-in user's email
+    email = user.email if user.is_authenticated else request.POST.get('email')
+
+    if email:
+        try:
+            from openedx.core.djangoapps.user_api.accounts.api import request_password_change
+            request_password_change(email, request.is_secure())
+            user = user if user.is_authenticated else User.objects.get(email=email)
+            destroy_oauth_tokens(user)
+        except UserNotFound:
+            AUDIT_LOG.info("Invalid password reset attempt")
+            # Increment the rate limit counter
+            limiter.tick_bad_request_counter(request)
+
+            # If enabled, send an email saying that a password reset was attempted, but that there is
+            # no user associated with the email
+            if configuration_helpers.get_value('ENABLE_PASSWORD_RESET_FAILURE_EMAIL',
+                                               settings.FEATURES['ENABLE_PASSWORD_RESET_FAILURE_EMAIL']):
+
+                site = get_current_site()
+                message_context = get_base_template_context(site)
+
+                message_context.update({
+                    'failed': True,
+                    'request': request,  # Used by google_analytics_tracking_pixel
+                    'email_address': email,
+                })
+
+                msg = PasswordReset().personalize(
+                    recipient=Recipient(username='', email_address=email),
+                    language=settings.LANGUAGE_CODE,
+                    user_context=message_context,
+                )
+
+                ace.send(msg)
+        except UserAPIInternalError as err:
+            log.exception('Error occured during password change for user {email}: {error}'
+                          .format(email=email, error=err))
+            return HttpResponse(_("Some error occured during password change. Please try again"), status=500)
+
+        return HttpResponse(status=200)
+    else:
+        return HttpResponseBadRequest(_("No email address provided."))
+
+
+
+@require_http_methods(['POST'])
+def account_recovery_request_handler(request):
+    """
+    Handle account recovery requests.
+
+    Arguments:
+        request (HttpRequest)
+
+    Returns:
+        HttpResponse: 200 if the email was sent successfully
+        HttpResponse: 400 if there is no 'email' POST parameter
+        HttpResponse: 403 if the client has been rate limited
+        HttpResponse: 405 if using an unsupported HTTP method
+        HttpResponse: 404 if account recovery feature is not enabled
+
+    Example:
+
+        POST /account/account_recovery
+
+    """
+    if not is_secondary_email_feature_enabled():
+        raise Http404
+
+    limiter = BadRequestRateLimiter()
+    if limiter.is_rate_limit_exceeded(request):
+        AUDIT_LOG.warning("Account recovery rate limit exceeded")
+        return HttpResponseForbidden()
+
+    user = request.user
+    # Prefer logged-in user's email
+    email = request.POST.get('email')
+
+    if email:
+        try:
+            # Send an email with a link to direct user towards account recovery.
+            from openedx.core.djangoapps.user_api.accounts.api import request_account_recovery
+            request_account_recovery(email, request.is_secure())
+
+            # Check if a user exists with the given secondary email, if so then invalidate the existing oauth tokens.
+            user = user if user.is_authenticated else User.objects.get(
+                id=AccountRecovery.objects.get_active(secondary_email__iexact=email).user.id
+            )
+            destroy_oauth_tokens(user)
+        except UserNotFound:
+            AUDIT_LOG.warning(
+                "Account recovery attempt via invalid secondary email '{email}'.".format(email=email)
+            )
+            limiter.tick_bad_request_counter(request)
+
+        return HttpResponse(status=200)
+    else:
+        return HttpResponseBadRequest(_("No email address provided."))
+
+
+@csrf_exempt
+@require_POST
+def password_reset(request):
+    """
+    Attempts to send a password reset e-mail.
+    """
+    # Add some rate limiting here by re-using the RateLimitMixin as a helper class
+    limiter = BadRequestRateLimiter()
+    if limiter.is_rate_limit_exceeded(request):
+        AUDIT_LOG.warning("Rate limit exceeded in password_reset")
+        return HttpResponseForbidden()
+
+    form = PasswordResetFormNoActive(request.POST)
+    if form.is_valid():
+        form.save(use_https=request.is_secure(),
+                  from_email=configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL),
+                  request=request)
+        # When password change is complete, a "edx.user.settings.changed" event will be emitted.
+        # But because changing the password is multi-step, we also emit an event here so that we can
+        # track where the request was initiated.
+        tracker.emit(
+            SETTING_CHANGE_INITIATED,
+            {
+                "setting": "password",
+                "old": None,
+                "new": None,
+                "user_id": request.user.id,
+            }
+        )
+        destroy_oauth_tokens(request.user)
+    else:
+        # bad user? tick the rate limiter counter
+        AUDIT_LOG.info("Bad password_reset user passed in.")
+        limiter.tick_bad_request_counter(request)
+
+    return JsonResponse({
+        'success': True,
+        'value': render_to_string('registration/password_reset_done.html', {}),
+    })
+
+
+def password_reset_confirm_wrapper(request, uidb36=None, token=None):
+    """
+    A wrapper around django.contrib.auth.views.password_reset_confirm.
+    Needed because we want to set the user as active at this step.
+    We also optionally do some additional password policy checks.
+    """
+    # convert old-style base36-encoded user id to base64
+    uidb64 = uidb36_to_uidb64(uidb36)
+    platform_name = {
+        "platform_name": configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME)
+    }
+    try:
+        uid_int = base36_to_int(uidb36)
+        user = User.objects.get(id=uid_int)
+    except (ValueError, User.DoesNotExist):
+        # if there's any error getting a user, just let django's
+        # password_reset_confirm function handle it.
+        return password_reset_confirm(
+            request, uidb64=uidb64, token=token, extra_context=platform_name
+        )
+
+    if UserRetirementRequest.has_user_requested_retirement(user):
+        # Refuse to reset the password of any user that has requested retirement.
+        context = {
+            'validlink': True,
+            'form': None,
+            'title': _('Password reset unsuccessful'),
+            'err_msg': _('Error in resetting your password.'),
+        }
+        context.update(platform_name)
+        return TemplateResponse(
+            request, 'registration/password_reset_confirm.html', context
+        )
+
+    if waffle().is_enabled(PREVENT_AUTH_USER_WRITES):
+        context = {
+            'validlink': False,
+            'form': None,
+            'title': _('Password reset unsuccessful'),
+            'err_msg': SYSTEM_MAINTENANCE_MSG,
+        }
+        context.update(platform_name)
+        return TemplateResponse(
+            request, 'registration/password_reset_confirm.html', context
+        )
+
+    if request.method == 'POST':
+        # We have to make a copy of request.POST because it is a QueryDict object which is immutable until copied.
+        # We have to use request.POST because the password_reset_confirm method takes in the request and a user's
+        # password is set to the request.POST['new_password1'] field. We have to also normalize the new_password2
+        # field so it passes the equivalence check that new_password1 == new_password2
+        # In order to switch out of having to do this copy, we would want to move the normalize_password code into
+        # a custom User model's set_password method to ensure it is always happening upon calling set_password.
+        request.POST = request.POST.copy()
+        request.POST['new_password1'] = normalize_password(request.POST['new_password1'])
+        request.POST['new_password2'] = normalize_password(request.POST['new_password2'])
+
+        password = request.POST['new_password1']
+
+        try:
+            validate_password(password, user=user)
+        except ValidationError as err:
+            # We have a password reset attempt which violates some security
+            # policy, or any other validation. Use the existing Django template to communicate that
+            # back to the user.
+            context = {
+                'validlink': True,
+                'form': None,
+                'title': _('Password reset unsuccessful'),
+                'err_msg': ' '.join(err.messages),
+            }
+            context.update(platform_name)
+            return TemplateResponse(
+                request, 'registration/password_reset_confirm.html', context
+            )
+
+        # remember what the old password hash is before we call down
+        old_password_hash = user.password
+
+        response = password_reset_confirm(
+            request, uidb64=uidb64, token=token, extra_context=platform_name
+        )
+
+        # If password reset was unsuccessful a template response is returned (status_code 200).
+        # Check if form is invalid then show an error to the user.
+        # Note if password reset was successful we get response redirect (status_code 302).
+        if response.status_code == 200:
+            form_valid = response.context_data['form'].is_valid() if response.context_data['form'] else False
+            if not form_valid:
+                log.warning(
+                    u'Unable to reset password for user [%s] because form is not valid. '
+                    u'A possible cause is that the user had an invalid reset token',
+                    user.username,
+                )
+                response.context_data['err_msg'] = _('Error in resetting your password. Please try again.')
+                return response
+
+        # get the updated user
+        updated_user = User.objects.get(id=uid_int)
+
+    else:
+        response = password_reset_confirm(
+            request, uidb64=uidb64, token=token, extra_context=platform_name
+        )
+
+        response_was_successful = response.context_data.get('validlink')
+        if response_was_successful and not user.is_active:
+            user.is_active = True
+            user.save()
+
+    return response
+
+
+
+def account_recovery_confirm_wrapper(request, uidb36=None, token=None):
+    """
+    A wrapper around django.contrib.auth.views.password_reset_confirm.
+    Needed because we want to set the user as active at this step.
+    We also optionally do some additional password policy checks.
+    """
+    # convert old-style base36-encoded user id to base64
+    uidb64 = uidb36_to_uidb64(uidb36)
+    platform_name = {
+        "platform_name": configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME)
+    }
+
+    # User can not get this link unless secondary email feature is enabled.
+    if not is_secondary_email_feature_enabled():
+        raise Http404
+
+    try:
+        uid_int = base36_to_int(uidb36)
+        user = User.objects.get(id=uid_int)
+    except (ValueError, User.DoesNotExist):
+        # if there's any error getting a user, just let django's
+        # password_reset_confirm function handle it.
+
+        return password_reset_confirm(
+            request,
+            uidb64=uidb64,
+            token=token,
+            extra_context=platform_name,
+            template_name='account_recovery/password_create_confirm.html'
+        )
+
+    if request.method == 'POST':
+        # We have to make a copy of request.POST because it is a QueryDict object which is immutable until copied.
+        # We have to use request.POST because the password_reset_confirm method takes in the request and a user's
+        # password is set to the request.POST['new_password1'] field. We have to also normalize the new_password2
+        # field so it passes the equivalence check that new_password1 == new_password2
+        # In order to switch out of having to do this copy, we would want to move the normalize_password code into
+        # a custom User model's set_password method to ensure it is always happening upon calling set_password.
+        request.POST = request.POST.copy()
+        request.POST['new_password1'] = normalize_password(request.POST['new_password1'])
+        request.POST['new_password2'] = normalize_password(request.POST['new_password2'])
+
+        password = request.POST['new_password1']
+
+        try:
+            validate_password(password, user=user)
+        except ValidationError as err:
+            # We have a password reset attempt which violates some security
+            # policy, or any other validation. Use the existing Django template to communicate that
+            # back to the user.
+            context = {
+                'validlink': True,
+                'form': None,
+                'title': _('Password creation unsuccessful'),
+                'err_msg': ' '.join(err.messages),
+            }
+            context.update(platform_name)
+
+            return TemplateResponse(
+                request, 'account_recovery/password_create_confirm.html', context
+            )
+
+        # remember what the old password hash is before we call down
+        old_password_hash = user.password
+
+        response = password_reset_confirm(
+            request,
+            uidb64=uidb64,
+            token=token,
+            extra_context=platform_name,
+            template_name='account_recovery/password_create_confirm.html',
+            post_reset_redirect='signin_user',
+        )
+
+        # If password reset was unsuccessful a template response is returned (status_code 200).
+        # Check if form is invalid then show an error to the user.
+        # Note if password reset was successful we get response redirect (status_code 302).
+        if response.status_code == 200:
+            form_valid = response.context_data['form'].is_valid() if response.context_data['form'] else False
+            if not form_valid:
+                log.warning(
+                    u'Unable to create password for user [%s] because form is not valid. '
+                    u'A possible cause is that the user had an invalid create token',
+                    user.username,
+                )
+                response.context_data['err_msg'] = _('Error in creating your password. Please try again.')
+                return response
+
+        # get the updated user
+        updated_user = User.objects.get(id=uid_int)
+        updated_user.email = updated_user.account_recovery.secondary_email
+        updated_user.save()
+
+        if response.status_code == 302:
+            messages.success(
+                request,
+                HTML(_(
+                    '{html_start}Password Creation Complete{html_end}'
+                    'Your password has been created. {bold_start}{email}{bold_end} is now your primary login email.'
+                )).format(
+                    support_url=configuration_helpers.get_value('SUPPORT_SITE_LINK', settings.SUPPORT_SITE_LINK),
+                    html_start=HTML('<p class="message-title">'),
+                    html_end=HTML('</p>'),
+                    bold_start=HTML('<b>'),
+                    bold_end=HTML('</b>'),
+                    email=updated_user.email,
+                ),
+                extra_tags='account-recovery aa-icon submission-success'
+            )
+    else:
+        response = password_reset_confirm(
+            request,
+            uidb64=uidb64,
+            token=token,
+            extra_context=platform_name,
+            template_name='account_recovery/password_create_confirm.html',
+        )
+
+        response_was_successful = response.context_data.get('validlink')
+        if response_was_successful and not user.is_active:
+            user.is_active = True
+            user.save()
+
+    return response
 
 
 @ensure_csrf_cookie

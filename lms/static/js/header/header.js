@@ -18,6 +18,13 @@ function createMobileMenu() {
     });
 }
 
+$(document).ready(function (){
+    if (dd.env.platform == "notInDingTalk") {
+      $('.dingtalkautologinbox').css('display', 'none');
+      $('.black-background').css('display', 'none');
+    }
+  })
+
 $(document).ready(function() {
     'use strict';
     var $hamburgerMenu;

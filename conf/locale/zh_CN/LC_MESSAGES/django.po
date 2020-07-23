@@ -24677,6 +24677,21 @@ msgstr "科海youtube账户信息未设置"
 msgid "Help and Support"
 msgstr "帮助和支持"
 
+msgid "No login in Dingtalk"
+msgstr "钉钉内免登陆"
+
+msgid "s later, here to go to the home page"
+msgstr "秒后， 将自动跳转到首页"
+
+msgid "Go to home page"
+msgstr "返回首页"
+
+msgid "Login failed"
+msgstr "登录失败"
+
+msgid "The user not in KH&academy, Login failed"
+msgstr "该用户不在科海商学院内,登录失败"
+
 msgid "Teacher login"
 msgstr "教员登录"
 

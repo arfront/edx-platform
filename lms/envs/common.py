@@ -407,7 +407,7 @@ FEATURES = {
     # Whether to display the account deletion section the account settings page
     'ENABLE_ACCOUNT_DELETION': True,
     
-    "THIRD_PARTY_AUTH_HINT": "oa2-dingtalk"
+    "THIRD_PARTY_AUTH_HINT": "oa2-dingtalk",
 
 
     # Enable feature to remove enrollments and users. Used to reset state of master's integration environments
