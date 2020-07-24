@@ -24692,6 +24692,12 @@ msgstr "登录失败"
 msgid "The user not in KH&academy, Login failed"
 msgstr "该用户不在科海商学院内,登录失败"
 
+msgid "Detected that you are open in DingTalk, are you logged in?"
+msgstr "检测到您在钉钉内打开,是否登录?"
+
+msgid "Waiting, please wait"
+msgstr "等待中，请稍后"
+
 msgid "Teacher login"
 msgstr "教员登录"
 

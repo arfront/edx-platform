@@ -10,6 +10,8 @@ from openedx.core.djangolib.markup import HTML, Text
 
 <main id="main" aria-label="Content" tabindex="-1">
     <section class="home">
+      <div class="black-background"></div>
+
       <header>
         <div class="outer-wrapper">
           <div class="title">
@@ -40,9 +42,24 @@ from openedx.core.djangolib.markup import HTML, Text
 
       </header>
       <%include file="${courses_list}" />
-
+      <div class="dingtalkautologinbox">
+        <div class="dingtalk-box-content">
+        ${_("Detected that you are open in DingTalk, are you logged in?")}
+            <div class="dingtalk-autologin-button-box">
+                <a href="#" onclick="closedingtalkbox()" class="dingtalk-autologin-cancle dingtalk-autologin-button" style="color: white">${_("Cancel")}</a>
+                <a href="/showdingtalkautologinjumppage/" class="dingtalk-autologin-login dingtalk-autologin-button" style="color: white">${_("sign in")}</a>
+            </div>
+        </div>
+    </div>
     </section>
 </main>
+
+<script type="application/javascript">
+  function closedingtalkbox() {
+      $('.dingtalkautologinbox').css('display', 'none');
+      $('.black-background').css('display', 'none');
+  }
+</script>
 
 % if show_homepage_promo_video:
   <section id="video-modal" class="modal home-page-video-modal video-modal">

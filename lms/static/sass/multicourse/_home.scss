@@ -7,7 +7,60 @@ $course-search-input-height: ($button-size);
 
 .home {
   padding: 0;
+  .dingtalkautologinbox {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 240px;
+    height: auto;
+    z-index: 999;
+    background-color: white;
+    border-style: solid;
+    border-color: #767676;
+    border-radius: 5px 5px 5px 5px;
+    line-height: 120%;
+  }
+  .dingtalk-box-content {
+    padding: 20px;
+  }
+  .dingtalk-autologin-button {
+    padding: 3px 20px;
+    border-radius: 5px;
+  }
 
+  .dingtalk-autologin-cancle {
+    border: 1.5px solid #767676;
+    background-color: #c8c8c8;
+    margin-right: 12px;
+  }
+
+  .dingtalk-autologin-login {
+    color: #fff;
+    border: 1.5px solid #1790c7;
+    background-color: #2bace6;
+    margin-left: 12px;
+  }
+  .dingtalk-autologin-button-box {
+    margin-top: 15px;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  .black-background {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    overflow: hidden;
+    outline: 0;
+    -webkit-overflow-scrolling: touch;
+    background-color: rgb(0, 0, 0);
+    filter: alpha(opacity=60);
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 998;
+  }
+  
   > .container {
     box-sizing: border-box;
     width: flex-grid(12);

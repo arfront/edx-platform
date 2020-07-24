@@ -140,7 +140,7 @@ class Dingtalkautologiniew(APIView):
         user = models.User.objects.get(id=user_id)
         user.backend = 'django.contrib.auth.backends.ModelBackend'
         login(request, user)
-        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+        return HttpResponseRedirect('/')
     
     def _db_cursor(self):
         db_alias = (
